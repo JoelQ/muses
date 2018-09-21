@@ -1,12 +1,18 @@
 module Main exposing (main)
 
+import Array
 import Browser
 import Html exposing (..)
 import Html.Events exposing (onClick)
+import Random
+import Random.Array
 
 
 type alias GameState =
-    { selectedDeck : Deck }
+    { selectedDeck : Deck
+    , myCards : List Card
+    , opponentCards : List Card
+    }
 
 
 type Game
@@ -21,11 +27,69 @@ type alias Model =
 
 type Msg
     = SelectDeck Deck
+    | StartPlaying GameState
 
 
 type Deck
     = Flashy
     | SlowAndSteady
+
+
+type Progress
+    = Progress Int
+
+
+type Power
+    = GenerateProgress Progress
+
+
+type Card
+    = Character Progress
+    | OneShot Power
+
+
+slowAndSteadyDeck : List Card
+slowAndSteadyDeck =
+    [ Character (Progress 1)
+    , Character (Progress 2)
+    , Character (Progress 3)
+    , Character (Progress 4)
+    , Character (Progress 5)
+    , Character (Progress 6)
+    ]
+
+
+flashyDeck : List Card
+flashyDeck =
+    [ OneShot (GenerateProgress <| Progress 10)
+    , OneShot (GenerateProgress <| Progress 20)
+    , OneShot (GenerateProgress <| Progress 30)
+    , OneShot (GenerateProgress <| Progress 20)
+    , OneShot (GenerateProgress <| Progress 10)
+    , OneShot (GenerateProgress <| Progress 10)
+    ]
+
+
+shuffle : List Card -> Random.Generator (List Card)
+shuffle cards =
+    cards
+        |> Array.fromList
+        |> Random.Array.shuffle
+        |> Random.map Array.toList
+
+
+startGame : Deck -> Random.Generator GameState
+startGame deck =
+    case deck of
+        Flashy ->
+            Random.map2 (GameState deck)
+                (shuffle flashyDeck)
+                (shuffle slowAndSteadyDeck)
+
+        SlowAndSteady ->
+            Random.map2 (GameState deck)
+                (shuffle slowAndSteadyDeck)
+                (shuffle flashyDeck)
 
 
 main : Program {} Model Msg
@@ -62,7 +126,10 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         SelectDeck deck ->
-            ( Playing <| GameState deck, Cmd.none )
+            ( model, Random.generate StartPlaying (startGame deck) )
+
+        StartPlaying state ->
+            ( Playing state, Cmd.none )
 
 
 view : Model -> Browser.Document Msg
@@ -78,8 +145,8 @@ viewGame game =
         Choosing ->
             choices
 
-        Playing { selectedDeck } ->
-            text <| "Playing with: " ++ deckName selectedDeck
+        Playing state ->
+            viewPlaying state
 
         Complete ->
             text "Someone won!"
@@ -93,3 +160,21 @@ choices =
 choice : Deck -> Html Msg
 choice deck =
     li [ onClick <| SelectDeck deck ] [ text <| deckName deck ]
+
+
+viewPlaying : GameState -> Html a
+viewPlaying { selectedDeck, myCards } =
+    div []
+        [ h3 [] [ text <| "Playing with: " ++ deckName selectedDeck ]
+        , ul [] <| List.map viewCard myCards
+        ]
+
+
+viewCard : Card -> Html a
+viewCard card =
+    case card of
+        Character (Progress n) ->
+            li [] [ text <| "Character - " ++ String.fromInt n ]
+
+        OneShot (GenerateProgress (Progress n)) ->
+            li [] [ text <| "OneShot - " ++ String.fromInt n ]
