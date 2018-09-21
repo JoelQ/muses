@@ -11,7 +11,9 @@ import Random.Array
 type alias GameState =
     { selectedDeck : Deck
     , myCards : List Card
+    , myScore : Int
     , opponentCards : List Card
+    , opponentScore : Int
     }
 
 
@@ -78,16 +80,26 @@ shuffle cards =
         |> Random.map Array.toList
 
 
-startGame : Deck -> Random.Generator GameState
-startGame deck =
+startGame : Deck -> List Card -> List Card -> GameState
+startGame selectedDeck myCards opponentCards =
+    { selectedDeck = selectedDeck
+    , myCards = myCards
+    , opponentCards = opponentCards
+    , myScore = 100
+    , opponentScore = 100
+    }
+
+
+shuffleAndStart : Deck -> Random.Generator GameState
+shuffleAndStart deck =
     case deck of
         Flashy ->
-            Random.map2 (GameState deck)
+            Random.map2 (startGame deck)
                 (shuffle flashyDeck)
                 (shuffle slowAndSteadyDeck)
 
         SlowAndSteady ->
-            Random.map2 (GameState deck)
+            Random.map2 (startGame deck)
                 (shuffle slowAndSteadyDeck)
                 (shuffle flashyDeck)
 
@@ -126,7 +138,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         SelectDeck deck ->
-            ( model, Random.generate StartPlaying (startGame deck) )
+            ( model, Random.generate StartPlaying (shuffleAndStart deck) )
 
         StartPlaying state ->
             ( Playing state, Cmd.none )
@@ -163,9 +175,12 @@ choice deck =
 
 
 viewPlaying : GameState -> Html a
-viewPlaying { selectedDeck, myCards } =
+viewPlaying { selectedDeck, myCards, myScore, opponentScore } =
     div []
-        [ h3 [] [ text <| "Playing with: " ++ deckName selectedDeck ]
+        [ h3 [] [ text <| "Oponnent" ]
+        , div [] [ text <| "Score: " ++ String.fromInt opponentScore ]
+        , h3 [] [ text <| "Me - " ++ deckName selectedDeck ]
+        , div [] [ text <| "Score: " ++ String.fromInt myScore ]
         , ul [] <| List.map viewCard myCards
         ]
 
