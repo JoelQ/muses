@@ -9,14 +9,21 @@ import Random
 import Random.Array
 
 
+type Player
+    = Player1
+    | Player2
+
+
 type alias GameState =
-    { selectedDeck : Deck
-    , myCards : Dict Int Card
-    , myScore : Int
-    , myCharacters : Dict Int Card
-    , opponentCards : Dict Int Card
-    , opponentScore : Int
-    , opponentCharacters : Dict Int Card
+    { p1Deck : Deck
+    , p1Cards : Dict Int Card
+    , p1Score : Int
+    , p1Characters : Dict Int Card
+    , p2Deck : Deck
+    , p2Cards : Dict Int Card
+    , p2Score : Int
+    , p2Characters : Dict Int Card
+    , currentPlayer : Player
     }
 
 
@@ -24,10 +31,10 @@ playCard : ( Int, Card ) -> GameState -> GameState
 playCard ( id, card ) state =
     case card of
         OneShot (GenerateProgress (Progress n)) ->
-            { state | myScore = state.myScore + n }
+            { state | p1Score = state.p1Score + n }
 
         Character _ ->
-            { state | myCharacters = Dict.insert id card state.myCharacters }
+            { state | p1Characters = Dict.insert id card state.p1Characters }
 
 
 type Game
@@ -96,15 +103,27 @@ shuffle cards =
 
 
 startGame : Deck -> List ( Int, Card ) -> List ( Int, Card ) -> GameState
-startGame selectedDeck myCards opponentCards =
-    { selectedDeck = selectedDeck
-    , myCards = Dict.fromList myCards
-    , myCharacters = Dict.empty
-    , opponentCards = Dict.fromList opponentCards
-    , myScore = 0
-    , opponentScore = 0
-    , opponentCharacters = Dict.empty
+startGame selectedDeck p1Cards p2Cards =
+    { p1Deck = selectedDeck
+    , p1Cards = Dict.fromList p1Cards
+    , p1Characters = Dict.empty
+    , p2Deck = otherDeck selectedDeck
+    , p2Cards = Dict.fromList p2Cards
+    , p1Score = 0
+    , p2Score = 0
+    , p2Characters = Dict.empty
+    , currentPlayer = Player1
     }
+
+
+otherDeck : Deck -> Deck
+otherDeck deck =
+    case deck of
+        SlowAndSteady ->
+            Flashy
+
+        Flashy ->
+            SlowAndSteady
 
 
 shuffleAndStart : Deck -> Random.Generator GameState
@@ -153,7 +172,7 @@ deckName deck =
 
 removeFromHand : Int -> GameState -> GameState
 removeFromHand cardId state =
-    { state | myCards = Dict.remove cardId state.myCards }
+    { state | p1Cards = Dict.remove cardId state.p1Cards }
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -209,18 +228,44 @@ choice deck =
 
 
 viewPlaying : GameState -> Html Msg
-viewPlaying { selectedDeck, myCards, myScore, myCharacters, opponentScore, opponentCharacters } =
+viewPlaying state =
+    case state.currentPlayer of
+        Player1 ->
+            player1View state
+
+        Player2 ->
+            player2View state
+
+
+player1View : GameState -> Html Msg
+player1View { p1Deck, p1Cards, p1Score, p1Characters, p2Score, p2Characters } =
     div []
-        [ h3 [] [ text <| "Opponent" ]
-        , div [] [ text <| "Score: " ++ String.fromInt opponentScore ]
+        [ h3 [] [ text <| "Player2" ]
+        , div [] [ text <| "Score: " ++ String.fromInt p2Score ]
         , h4 [] [ text "Characters" ]
-        , ul [] <| List.map viewCharacter <| Dict.toList opponentCharacters
-        , h3 [] [ text <| "Me - " ++ deckName selectedDeck ]
-        , div [] [ text <| "Score: " ++ String.fromInt myScore ]
+        , ul [] <| List.map viewCharacter <| Dict.toList p2Characters
+        , h3 [] [ text <| "Me - " ++ deckName p1Deck ]
+        , div [] [ text <| "Score: " ++ String.fromInt p1Score ]
         , h4 [] [ text "Characters" ]
-        , ul [] <| List.map viewCharacter <| Dict.toList myCharacters
+        , ul [] <| List.map viewCharacter <| Dict.toList p1Characters
         , h4 [] [ text "Hand" ]
-        , ul [] <| List.map viewCard <| Dict.toList myCards
+        , ul [] <| List.map viewCard <| Dict.toList p1Cards
+        ]
+
+
+player2View : GameState -> Html Msg
+player2View { p2Deck, p2Cards, p1Score, p1Characters, p2Score, p2Characters } =
+    div []
+        [ h3 [] [ text <| "Player 1" ]
+        , div [] [ text <| "Score: " ++ String.fromInt p1Score ]
+        , h4 [] [ text "Characters" ]
+        , ul [] <| List.map viewCharacter <| Dict.toList p1Characters
+        , h3 [] [ text <| "Me - " ++ deckName p2Deck ]
+        , div [] [ text <| "Score: " ++ String.fromInt p2Score ]
+        , h4 [] [ text "Characters" ]
+        , ul [] <| List.map viewCharacter <| Dict.toList p2Characters
+        , h4 [] [ text "Hand" ]
+        , ul [] <| List.map viewCard <| Dict.toList p2Cards
         ]
 
 
