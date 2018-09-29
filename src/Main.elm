@@ -13,19 +13,21 @@ type alias GameState =
     { selectedDeck : Deck
     , myCards : Dict Int Card
     , myScore : Int
+    , myCharacters : Dict Int Card
     , opponentCards : Dict Int Card
     , opponentScore : Int
+    , opponentCharacters : Dict Int Card
     }
 
 
-playCard : Card -> GameState -> GameState
-playCard card state =
+playCard : ( Int, Card ) -> GameState -> GameState
+playCard ( id, card ) state =
     case card of
         OneShot (GenerateProgress (Progress n)) ->
             { state | myScore = state.myScore + n }
 
         Character _ ->
-            state
+            { state | myCharacters = Dict.insert id card state.myCharacters }
 
 
 type Game
@@ -97,9 +99,11 @@ startGame : Deck -> List ( Int, Card ) -> List ( Int, Card ) -> GameState
 startGame selectedDeck myCards opponentCards =
     { selectedDeck = selectedDeck
     , myCards = Dict.fromList myCards
+    , myCharacters = Dict.empty
     , opponentCards = Dict.fromList opponentCards
     , myScore = 0
     , opponentScore = 0
+    , opponentCharacters = Dict.empty
     }
 
 
@@ -165,7 +169,7 @@ update msg model =
             case model of
                 Playing state ->
                     state
-                        |> playCard card
+                        |> playCard ( cardId, card )
                         |> removeFromHand cardId
                         |> Playing
                         |> (\s -> ( s, Cmd.none ))
@@ -205,12 +209,17 @@ choice deck =
 
 
 viewPlaying : GameState -> Html Msg
-viewPlaying { selectedDeck, myCards, myScore, opponentScore } =
+viewPlaying { selectedDeck, myCards, myScore, myCharacters, opponentScore, opponentCharacters } =
     div []
-        [ h3 [] [ text <| "Oponnent" ]
+        [ h3 [] [ text <| "Opponent" ]
         , div [] [ text <| "Score: " ++ String.fromInt opponentScore ]
+        , h4 [] [ text "Characters" ]
+        , ul [] <| List.map viewCharacter <| Dict.toList opponentCharacters
         , h3 [] [ text <| "Me - " ++ deckName selectedDeck ]
         , div [] [ text <| "Score: " ++ String.fromInt myScore ]
+        , h4 [] [ text "Characters" ]
+        , ul [] <| List.map viewCharacter <| Dict.toList myCharacters
+        , h4 [] [ text "Hand" ]
         , ul [] <| List.map viewCard <| Dict.toList myCards
         ]
 
@@ -219,7 +228,17 @@ viewCard : ( Int, Card ) -> Html Msg
 viewCard ( id, card ) =
     case card of
         Character (Progress n) ->
-            li [] [ text <| "Character - " ++ String.fromInt n ]
+            li [ onClick (PlayCard id card) ] [ text <| "Character - " ++ String.fromInt n ]
 
         OneShot (GenerateProgress (Progress n)) ->
             li [ onClick (PlayCard id card) ] [ text <| "OneShot - " ++ String.fromInt n ]
+
+
+viewCharacter : ( Int, Card ) -> Html Msg
+viewCharacter ( id, card ) =
+    case card of
+        Character (Progress n) ->
+            li [] [ text <| "Character - " ++ String.fromInt n ]
+
+        OneShot _ ->
+            li [] [ text "Not Allowed" ]
