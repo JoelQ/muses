@@ -17,6 +17,16 @@ type alias GameState =
     }
 
 
+playCard : Card -> GameState -> GameState
+playCard card state =
+    case card of
+        OneShot (GenerateProgress (Progress n)) ->
+            { state | myScore = state.myScore + n }
+
+        Character _ ->
+            state
+
+
 type Game
     = Choosing
     | Playing GameState
@@ -30,6 +40,7 @@ type alias Model =
 type Msg
     = SelectDeck Deck
     | StartPlaying GameState
+    | PlayCard Card
 
 
 type Deck
@@ -85,8 +96,8 @@ startGame selectedDeck myCards opponentCards =
     { selectedDeck = selectedDeck
     , myCards = myCards
     , opponentCards = opponentCards
-    , myScore = 100
-    , opponentScore = 100
+    , myScore = 0
+    , opponentScore = 0
     }
 
 
@@ -143,6 +154,14 @@ update msg model =
         StartPlaying state ->
             ( Playing state, Cmd.none )
 
+        PlayCard card ->
+            case model of
+                Playing state ->
+                    ( Playing <| playCard card state, Cmd.none )
+
+                _ ->
+                    ( model, Cmd.none )
+
 
 view : Model -> Browser.Document Msg
 view model =
@@ -174,7 +193,7 @@ choice deck =
     li [ onClick <| SelectDeck deck ] [ text <| deckName deck ]
 
 
-viewPlaying : GameState -> Html a
+viewPlaying : GameState -> Html Msg
 viewPlaying { selectedDeck, myCards, myScore, opponentScore } =
     div []
         [ h3 [] [ text <| "Oponnent" ]
@@ -185,11 +204,11 @@ viewPlaying { selectedDeck, myCards, myScore, opponentScore } =
         ]
 
 
-viewCard : Card -> Html a
+viewCard : Card -> Html Msg
 viewCard card =
     case card of
         Character (Progress n) ->
             li [] [ text <| "Character - " ++ String.fromInt n ]
 
         OneShot (GenerateProgress (Progress n)) ->
-            li [] [ text <| "OneShot - " ++ String.fromInt n ]
+            li [ onClick (PlayCard card) ] [ text <| "OneShot - " ++ String.fromInt n ]
