@@ -2,6 +2,7 @@ module Main exposing (main)
 
 import Array
 import Browser
+import Dict exposing (Dict)
 import Html exposing (..)
 import Html.Events exposing (onClick)
 import Random
@@ -10,9 +11,9 @@ import Random.Array
 
 type alias GameState =
     { selectedDeck : Deck
-    , myCards : List Card
+    , myCards : Dict Int Card
     , myScore : Int
-    , opponentCards : List Card
+    , opponentCards : Dict Int Card
     , opponentScore : Int
     }
 
@@ -40,7 +41,7 @@ type alias Model =
 type Msg
     = SelectDeck Deck
     | StartPlaying GameState
-    | PlayCard Card
+    | PlayCard Int Card
 
 
 type Deck
@@ -83,19 +84,20 @@ flashyDeck =
     ]
 
 
-shuffle : List Card -> Random.Generator (List Card)
+shuffle : List Card -> Random.Generator (List ( Int, Card ))
 shuffle cards =
     cards
         |> Array.fromList
         |> Random.Array.shuffle
         |> Random.map Array.toList
+        |> Random.map (List.indexedMap Tuple.pair)
 
 
-startGame : Deck -> List Card -> List Card -> GameState
+startGame : Deck -> List ( Int, Card ) -> List ( Int, Card ) -> GameState
 startGame selectedDeck myCards opponentCards =
     { selectedDeck = selectedDeck
-    , myCards = myCards
-    , opponentCards = opponentCards
+    , myCards = Dict.fromList myCards
+    , opponentCards = Dict.fromList opponentCards
     , myScore = 0
     , opponentScore = 0
     }
@@ -145,6 +147,11 @@ deckName deck =
             "Flashy"
 
 
+removeFromHand : Int -> GameState -> GameState
+removeFromHand cardId state =
+    { state | myCards = Dict.remove cardId state.myCards }
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -154,10 +161,14 @@ update msg model =
         StartPlaying state ->
             ( Playing state, Cmd.none )
 
-        PlayCard card ->
+        PlayCard cardId card ->
             case model of
                 Playing state ->
-                    ( Playing <| playCard card state, Cmd.none )
+                    state
+                        |> playCard card
+                        |> removeFromHand cardId
+                        |> Playing
+                        |> (\s -> ( s, Cmd.none ))
 
                 _ ->
                     ( model, Cmd.none )
@@ -200,15 +211,15 @@ viewPlaying { selectedDeck, myCards, myScore, opponentScore } =
         , div [] [ text <| "Score: " ++ String.fromInt opponentScore ]
         , h3 [] [ text <| "Me - " ++ deckName selectedDeck ]
         , div [] [ text <| "Score: " ++ String.fromInt myScore ]
-        , ul [] <| List.map viewCard myCards
+        , ul [] <| List.map viewCard <| Dict.toList myCards
         ]
 
 
-viewCard : Card -> Html Msg
-viewCard card =
+viewCard : ( Int, Card ) -> Html Msg
+viewCard ( id, card ) =
     case card of
         Character (Progress n) ->
             li [] [ text <| "Character - " ++ String.fromInt n ]
 
         OneShot (GenerateProgress (Progress n)) ->
-            li [ onClick (PlayCard card) ] [ text <| "OneShot - " ++ String.fromInt n ]
+            li [ onClick (PlayCard id card) ] [ text <| "OneShot - " ++ String.fromInt n ]
