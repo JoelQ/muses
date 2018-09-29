@@ -51,6 +51,7 @@ type Msg
     = SelectDeck Deck
     | StartPlaying GameState
     | PlayCard Int Card
+    | EndTurn
 
 
 type Deck
@@ -175,6 +176,16 @@ removeFromHand cardId state =
     { state | p1Cards = Dict.remove cardId state.p1Cards }
 
 
+nextPlayer : Player -> Player
+nextPlayer player =
+    case player of
+        Player1 ->
+            Player2
+
+        Player2 ->
+            Player1
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -183,6 +194,16 @@ update msg model =
 
         StartPlaying state ->
             ( Playing state, Cmd.none )
+
+        EndTurn ->
+            case model of
+                Playing state ->
+                    { state | currentPlayer = nextPlayer state.currentPlayer }
+                        |> Playing
+                        |> (\s -> ( s, Cmd.none ))
+
+                _ ->
+                    ( model, Cmd.none )
 
         PlayCard cardId card ->
             case model of
@@ -250,6 +271,7 @@ player1View { p1Deck, p1Cards, p1Score, p1Characters, p2Score, p2Characters } =
         , ul [] <| List.map viewCharacter <| Dict.toList p1Characters
         , h4 [] [ text "Hand" ]
         , ul [] <| List.map viewCard <| Dict.toList p1Cards
+        , button [ onClick EndTurn ] [ text "End Turn" ]
         ]
 
 
@@ -266,6 +288,7 @@ player2View { p2Deck, p2Cards, p1Score, p1Characters, p2Score, p2Characters } =
         , ul [] <| List.map viewCharacter <| Dict.toList p2Characters
         , h4 [] [ text "Hand" ]
         , ul [] <| List.map viewCard <| Dict.toList p2Cards
+        , button [ onClick EndTurn ] [ text "End Turn" ]
         ]
 
 
