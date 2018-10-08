@@ -10,7 +10,8 @@ import Random.Array
 
 
 type alias Player =
-    { deck : Deck
+    { name : String
+    , deck : Deck
     , cards : Dict Int Card
     , score : Int
     , characters : Dict Int Card
@@ -109,15 +110,15 @@ shuffle cards =
         |> Random.map (List.indexedMap Tuple.pair)
 
 
-initialPlayer : Deck -> List ( Int, Card ) -> Player
-initialPlayer deck cards =
-    Player deck (Dict.fromList cards) 0 Dict.empty
+initialPlayer : String -> Deck -> List ( Int, Card ) -> Player
+initialPlayer name deck cards =
+    Player name deck (Dict.fromList cards) 0 Dict.empty
 
 
 startGame : Deck -> List ( Int, Card ) -> List ( Int, Card ) -> GameState
 startGame selectedDeck p1Cards p2Cards =
-    { currentPlayer = initialPlayer selectedDeck p1Cards
-    , otherPlayer = initialPlayer (otherDeck selectedDeck) p2Cards
+    { currentPlayer = initialPlayer "Player 1" selectedDeck p1Cards
+    , otherPlayer = initialPlayer "Player 2" (otherDeck selectedDeck) p2Cards
     }
 
 
@@ -256,7 +257,7 @@ choice deck =
 viewPlaying : GameState -> Html Msg
 viewPlaying { currentPlayer, otherPlayer } =
     div []
-        [ h3 [] [ text <| "Player2" ]
+        [ h3 [] [ text <| otherPlayer.name ]
         , div [] [ text <| "Score: " ++ String.fromInt otherPlayer.score ]
         , h4 [] [ text "Characters" ]
         , ul [] <| List.map viewCharacter <| Dict.toList otherPlayer.characters
