@@ -3,6 +3,25 @@ module Main exposing (main)
 import Array
 import Browser
 import Dict exposing (Dict)
+import Element
+    exposing
+        ( Element
+        , alignLeft
+        , alignRight
+        , centerX
+        , column
+        , el
+        , fill
+        , height
+        , padding
+        , paragraph
+        , px
+        , row
+        , spacing
+        , width
+        )
+import Element.Border as Border
+import Element.Font as Font
 import Html exposing (..)
 import Html.Events exposing (onClick)
 import Random
@@ -279,19 +298,29 @@ viewPlaying { currentPlayer, otherPlayer } =
         , h4 [] [ text "Characters" ]
         , ul [] <| List.map viewCharacter <| Dict.toList currentPlayer.characters
         , h4 [] [ text "Hand" ]
-        , ul [] <| List.map viewCard <| Dict.toList currentPlayer.cards
+        , Element.layout [] (row [] <| List.map cardElement <| Dict.toList currentPlayer.cards)
         , button [ onClick EndTurn ] [ text "End Turn" ]
         ]
 
 
-viewCard : ( Int, Card ) -> Html Msg
-viewCard ( id, card ) =
+cardName : Card -> String
+cardName card =
+    case card of
+        Character _ ->
+            "Character"
+
+        OneShot _ ->
+            "OneShot"
+
+
+progress : Card -> String
+progress card =
     case card of
         Character (Progress n) ->
-            li [ onClick (PlayCard id card) ] [ text <| "Character - " ++ String.fromInt n ]
+            String.fromInt n
 
         OneShot (GenerateProgress (Progress n)) ->
-            li [ onClick (PlayCard id card) ] [ text <| "OneShot - " ++ String.fromInt n ]
+            String.fromInt n
 
 
 viewCharacter : ( Int, Card ) -> Html Msg
@@ -302,3 +331,28 @@ viewCharacter ( id, card ) =
 
         OneShot _ ->
             li [] [ text "Not Allowed" ]
+
+
+cardElement : ( Int, Card ) -> Element Msg
+cardElement ( id, card ) =
+    column
+        [ spacing 5
+        , padding 5
+        , Border.width 5
+        , Border.rounded 10
+        , width (px 225)
+        , height (px 300)
+        ]
+        [ row [ width fill ]
+            [ el [ alignLeft ] <| Element.text (cardName card)
+            , el [ alignRight ] <| Element.text (progress card)
+            ]
+        , el [ centerX, padding 5 ]
+            (Element.image []
+                { src = "https://via.placeholder.com/175x125"
+                , description = "placeholder"
+                }
+            )
+        , paragraph [ centerX, width (px 175), Font.italic, Font.size 14 ]
+            [ Element.text "Some colorful flavor text that keeps going and going and going" ]
+        ]
