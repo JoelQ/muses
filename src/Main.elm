@@ -56,10 +56,10 @@ playCard : ( Int, Card ) -> GameState -> GameState
 playCard ( id, card ) state =
     case card of
         OneShot (GenerateProgress (Progress n)) ->
-            { state | currentPlayer = increaseScore n state.currentPlayer }
+            modifyCurrentPlayer (increaseScore n) state
 
         Character _ ->
-            { state | currentPlayer = playCharacter id card state.currentPlayer }
+            modifyCurrentPlayer (playCharacter id card) state
 
 
 startGame : Deck -> List ( Int, Card ) -> List ( Int, Card ) -> GameState
@@ -85,12 +85,17 @@ shuffleAndStart deck =
 
 removeFromHand : Int -> GameState -> GameState
 removeFromHand cardId state =
-    { state | currentPlayer = removeFromPlayerHand cardId state.currentPlayer }
+    modifyCurrentPlayer (removeFromPlayerHand cardId) state
 
 
 swapPlayers : GameState -> GameState
 swapPlayers { currentPlayer, otherPlayer } =
     { currentPlayer = otherPlayer, otherPlayer = currentPlayer }
+
+
+modifyCurrentPlayer : (Player -> Player) -> GameState -> GameState
+modifyCurrentPlayer playerFunction state =
+    { state | currentPlayer = playerFunction state.currentPlayer }
 
 
 type Game
