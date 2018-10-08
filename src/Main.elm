@@ -9,18 +9,16 @@ import Random
 import Random.Array
 
 
+
+-- PLAYER
+
+
 type alias Player =
     { name : String
     , deck : Deck
     , cards : Dict Int Card
     , score : Int
     , characters : Dict Int Card
-    }
-
-
-type alias GameState =
-    { currentPlayer : Player
-    , otherPlayer : Player
     }
 
 
@@ -34,6 +32,26 @@ playCharacter id card player =
     { player | characters = Dict.insert id card player.characters }
 
 
+initialPlayer : String -> Deck -> List ( Int, Card ) -> Player
+initialPlayer name deck cards =
+    Player name deck (Dict.fromList cards) 0 Dict.empty
+
+
+removeFromPlayerHand : Int -> Player -> Player
+removeFromPlayerHand cardId player =
+    { player | cards = Dict.remove cardId player.cards }
+
+
+
+-- GAME STATE
+
+
+type alias GameState =
+    { currentPlayer : Player
+    , otherPlayer : Player
+    }
+
+
 playCard : ( Int, Card ) -> GameState -> GameState
 playCard ( id, card ) state =
     case card of
@@ -42,6 +60,37 @@ playCard ( id, card ) state =
 
         Character _ ->
             { state | currentPlayer = playCharacter id card state.currentPlayer }
+
+
+startGame : Deck -> List ( Int, Card ) -> List ( Int, Card ) -> GameState
+startGame selectedDeck p1Cards p2Cards =
+    { currentPlayer = initialPlayer "Player 1" selectedDeck p1Cards
+    , otherPlayer = initialPlayer "Player 2" (otherDeck selectedDeck) p2Cards
+    }
+
+
+shuffleAndStart : Deck -> Random.Generator GameState
+shuffleAndStart deck =
+    case deck of
+        Flashy ->
+            Random.map2 (startGame deck)
+                (shuffle flashyDeck)
+                (shuffle slowAndSteadyDeck)
+
+        SlowAndSteady ->
+            Random.map2 (startGame deck)
+                (shuffle slowAndSteadyDeck)
+                (shuffle flashyDeck)
+
+
+removeFromHand : Int -> GameState -> GameState
+removeFromHand cardId state =
+    { state | currentPlayer = removeFromPlayerHand cardId state.currentPlayer }
+
+
+swapPlayers : GameState -> GameState
+swapPlayers { currentPlayer, otherPlayer } =
+    { currentPlayer = otherPlayer, otherPlayer = currentPlayer }
 
 
 type Game
@@ -110,18 +159,6 @@ shuffle cards =
         |> Random.map (List.indexedMap Tuple.pair)
 
 
-initialPlayer : String -> Deck -> List ( Int, Card ) -> Player
-initialPlayer name deck cards =
-    Player name deck (Dict.fromList cards) 0 Dict.empty
-
-
-startGame : Deck -> List ( Int, Card ) -> List ( Int, Card ) -> GameState
-startGame selectedDeck p1Cards p2Cards =
-    { currentPlayer = initialPlayer "Player 1" selectedDeck p1Cards
-    , otherPlayer = initialPlayer "Player 2" (otherDeck selectedDeck) p2Cards
-    }
-
-
 otherDeck : Deck -> Deck
 otherDeck deck =
     case deck of
@@ -130,20 +167,6 @@ otherDeck deck =
 
         Flashy ->
             SlowAndSteady
-
-
-shuffleAndStart : Deck -> Random.Generator GameState
-shuffleAndStart deck =
-    case deck of
-        Flashy ->
-            Random.map2 (startGame deck)
-                (shuffle flashyDeck)
-                (shuffle slowAndSteadyDeck)
-
-        SlowAndSteady ->
-            Random.map2 (startGame deck)
-                (shuffle slowAndSteadyDeck)
-                (shuffle flashyDeck)
 
 
 main : Program {} Model Msg
@@ -174,21 +197,6 @@ deckName deck =
 
         Flashy ->
             "Flashy"
-
-
-removeFromPlayerHand : Int -> Player -> Player
-removeFromPlayerHand cardId player =
-    { player | cards = Dict.remove cardId player.cards }
-
-
-removeFromHand : Int -> GameState -> GameState
-removeFromHand cardId state =
-    { state | currentPlayer = removeFromPlayerHand cardId state.currentPlayer }
-
-
-swapPlayers : GameState -> GameState
-swapPlayers { currentPlayer, otherPlayer } =
-    { currentPlayer = otherPlayer, otherPlayer = currentPlayer }
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
