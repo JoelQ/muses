@@ -119,10 +119,38 @@ modifyCurrentPlayer playerFunction state =
     { state | currentPlayer = playerFunction state.currentPlayer }
 
 
+
+-- GAME
+
+
 type Game
     = Choosing
     | Playing GameState
     | Complete
+
+
+checkWin : GameState -> Game
+checkWin ({ currentPlayer, otherPlayer } as state) =
+    if currentPlayer.score >= 100 || otherPlayer.score >= 100 then
+        Complete
+
+    else
+        Playing state
+
+
+andThen : (GameState -> Game) -> Game -> Game
+andThen function game =
+    case game of
+        Playing state ->
+            function state
+
+        _ ->
+            game
+
+
+map : (GameState -> GameState) -> Game -> Game
+map function =
+    andThen (Playing << function)
 
 
 type alias Model =
@@ -225,6 +253,11 @@ deckName deck =
             "Flashy"
 
 
+withNoCmd : Model -> ( Model, Cmd Msg )
+withNoCmd model =
+    ( model, Cmd.none )
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -235,27 +268,17 @@ update msg model =
             ( Playing state, Cmd.none )
 
         EndTurn ->
-            case model of
-                Playing state ->
-                    state
-                        |> swapPlayers
-                        |> Playing
-                        |> (\s -> ( s, Cmd.none ))
-
-                _ ->
-                    ( model, Cmd.none )
+            model
+                |> andThen checkWin
+                |> map swapPlayers
+                |> withNoCmd
 
         PlayCard cardId card ->
-            case model of
-                Playing state ->
-                    state
-                        |> playCard ( cardId, card )
-                        |> removeFromHand cardId
-                        |> Playing
-                        |> (\s -> ( s, Cmd.none ))
-
-                _ ->
-                    ( model, Cmd.none )
+            model
+                |> map (playCard ( cardId, card ))
+                |> map (removeFromHand cardId)
+                |> andThen checkWin
+                |> withNoCmd
 
 
 view : Model -> Browser.Document Msg
