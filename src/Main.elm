@@ -24,6 +24,7 @@ import Element.Border as Border
 import Element.Events as Events
 import Element.Font as Font
 import Html exposing (..)
+import Html.Attributes exposing (max, value)
 import Html.Events exposing (onClick)
 import Random
 import Random.Array
@@ -291,18 +292,27 @@ viewPlaying : GameState -> Html Msg
 viewPlaying { currentPlayer, otherPlayer } =
     div []
         [ h3 [] [ text <| otherPlayer.name ]
-        , div [] [ text <| "Score: " ++ String.fromInt otherPlayer.score ]
+        , div [] [ viewScore otherPlayer.score ]
         , h4 [] [ text "Hand" ]
         , cardListBack 210 <| Dict.toList otherPlayer.cards
         , h4 [] [ text "Characters" ]
         , cardList 210 <| Dict.toList otherPlayer.characters
         , h3 [] [ text <| "Me - " ++ deckName currentPlayer.deck ]
-        , div [] [ text <| "Score: " ++ String.fromInt currentPlayer.score ]
+        , div [] [ viewScore currentPlayer.score ]
         , h4 [] [ text "Characters" ]
         , cardList 210 <| Dict.toList currentPlayer.characters
         , h4 [] [ text "Hand" ]
         , cardList 210 <| Dict.toList currentPlayer.cards
         , button [ onClick EndTurn ] [ text "End Turn" ]
+        ]
+
+
+viewScore : Int -> Html a
+viewScore score =
+    div []
+        [ text (String.fromInt score)
+        , Html.progress [ max "100", value (String.fromInt score) ]
+            [ text (String.fromInt score) ]
         ]
 
 
