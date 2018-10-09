@@ -43,6 +43,19 @@ type alias Player =
     }
 
 
+scoreFromCharacters : Player -> Int
+scoreFromCharacters { characters } =
+    Dict.values characters
+        |> List.map magnitude
+        |> List.map rawPoints
+        |> List.sum
+
+
+addPointsFromCharacters : Player -> Player
+addPointsFromCharacters player =
+    increaseScore (scoreFromCharacters player) player
+
+
 increaseScore : Int -> Player -> Player
 increaseScore n player =
     { player | score = player.score + n }
@@ -76,7 +89,7 @@ type alias GameState =
 playCard : ( Int, Card ) -> GameState -> GameState
 playCard ( id, card ) state =
     case card of
-        OneShot (GenerateProgress (Progress n)) ->
+        OneShot (GeneratePoints (MuseumPoints n)) ->
             modifyCurrentPlayer (increaseScore n) state
 
         Character _ ->
@@ -107,6 +120,11 @@ shuffleAndStart deck =
 removeFromHand : Int -> GameState -> GameState
 removeFromHand cardId state =
     modifyCurrentPlayer (removeFromPlayerHand cardId) state
+
+
+playCurrentCharacters : GameState -> GameState
+playCurrentCharacters =
+    modifyCurrentPlayer addPointsFromCharacters
 
 
 swapPlayers : GameState -> GameState
@@ -169,38 +187,43 @@ type Deck
     | SlowAndSteady
 
 
-type Progress
-    = Progress Int
+type MuseumPoints
+    = MuseumPoints Int
+
+
+rawPoints : MuseumPoints -> Int
+rawPoints (MuseumPoints n) =
+    n
 
 
 type Power
-    = GenerateProgress Progress
+    = GeneratePoints MuseumPoints
 
 
 type Card
-    = Character Progress
+    = Character MuseumPoints
     | OneShot Power
 
 
 slowAndSteadyDeck : List Card
 slowAndSteadyDeck =
-    [ Character (Progress 1)
-    , Character (Progress 2)
-    , Character (Progress 3)
-    , Character (Progress 4)
-    , Character (Progress 5)
-    , Character (Progress 6)
+    [ Character (MuseumPoints 1)
+    , Character (MuseumPoints 2)
+    , Character (MuseumPoints 3)
+    , Character (MuseumPoints 4)
+    , Character (MuseumPoints 5)
+    , Character (MuseumPoints 6)
     ]
 
 
 flashyDeck : List Card
 flashyDeck =
-    [ OneShot (GenerateProgress <| Progress 10)
-    , OneShot (GenerateProgress <| Progress 20)
-    , OneShot (GenerateProgress <| Progress 30)
-    , OneShot (GenerateProgress <| Progress 20)
-    , OneShot (GenerateProgress <| Progress 10)
-    , OneShot (GenerateProgress <| Progress 10)
+    [ OneShot (GeneratePoints <| MuseumPoints 10)
+    , OneShot (GeneratePoints <| MuseumPoints 20)
+    , OneShot (GeneratePoints <| MuseumPoints 30)
+    , OneShot (GeneratePoints <| MuseumPoints 20)
+    , OneShot (GeneratePoints <| MuseumPoints 10)
+    , OneShot (GeneratePoints <| MuseumPoints 10)
     ]
 
 
@@ -269,6 +292,7 @@ update msg model =
 
         EndTurn ->
             model
+                |> map playCurrentCharacters
                 |> andThen checkWin
                 |> map swapPlayers
                 |> withNoCmd
@@ -346,14 +370,19 @@ cardName card =
             "OneShot"
 
 
-progress : Card -> String
-progress card =
+magnitude : Card -> MuseumPoints
+magnitude card =
     case card of
-        Character (Progress n) ->
-            String.fromInt n
+        Character points ->
+            points
 
-        OneShot (GenerateProgress (Progress n)) ->
-            String.fromInt n
+        OneShot (GeneratePoints points) ->
+            points
+
+
+magnitudeString : Card -> String
+magnitudeString =
+    String.fromInt << rawPoints << magnitude
 
 
 cardRatio : Float
@@ -410,7 +439,7 @@ cardElement cardHeight ( id, card ) =
         ]
         [ row [ width fill ]
             [ el [ alignLeft ] <| Element.text (cardName card)
-            , el [ alignRight ] <| Element.text (progress card)
+            , el [ alignRight ] <| Element.text (magnitudeString card)
             ]
         , el [ centerX, padding 5 ] (cardImage cardHeight)
         , paragraph [ centerX, Font.italic, Font.size 14 ]
