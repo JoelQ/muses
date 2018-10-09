@@ -293,7 +293,7 @@ viewPlaying { currentPlayer, otherPlayer } =
         [ h3 [] [ text <| otherPlayer.name ]
         , div [] [ text <| "Score: " ++ String.fromInt otherPlayer.score ]
         , h4 [] [ text "Characters" ]
-        , ul [] <| List.map viewCharacter <| Dict.toList otherPlayer.characters
+        , cardList 225 <| Dict.toList otherPlayer.characters
         , h3 [] [ text <| "Me - " ++ deckName currentPlayer.deck ]
         , div [] [ text <| "Score: " ++ String.fromInt currentPlayer.score ]
         , h4 [] [ text "Characters" ]
@@ -322,16 +322,6 @@ progress card =
 
         OneShot (GenerateProgress (Progress n)) ->
             String.fromInt n
-
-
-viewCharacter : ( Int, Card ) -> Html Msg
-viewCharacter ( id, card ) =
-    case card of
-        Character (Progress n) ->
-            li [] [ text <| "Character - " ++ String.fromInt n ]
-
-        OneShot _ ->
-            li [] [ text "Not Allowed" ]
 
 
 cardRatio : Float
