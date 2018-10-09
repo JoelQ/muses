@@ -292,14 +292,16 @@ viewPlaying { currentPlayer, otherPlayer } =
     div []
         [ h3 [] [ text <| otherPlayer.name ]
         , div [] [ text <| "Score: " ++ String.fromInt otherPlayer.score ]
+        , h4 [] [ text "Hand" ]
+        , cardListBack 210 <| Dict.toList otherPlayer.cards
         , h4 [] [ text "Characters" ]
-        , cardList 225 <| Dict.toList otherPlayer.characters
+        , cardList 210 <| Dict.toList otherPlayer.characters
         , h3 [] [ text <| "Me - " ++ deckName currentPlayer.deck ]
         , div [] [ text <| "Score: " ++ String.fromInt currentPlayer.score ]
         , h4 [] [ text "Characters" ]
-        , cardList 225 <| Dict.toList currentPlayer.characters
+        , cardList 210 <| Dict.toList currentPlayer.characters
         , h4 [] [ text "Hand" ]
-        , cardList 225 <| Dict.toList currentPlayer.cards
+        , cardList 210 <| Dict.toList currentPlayer.cards
         , button [ onClick EndTurn ] [ text "End Turn" ]
         ]
 
@@ -352,6 +354,19 @@ cardImage cardHeight =
         }
 
 
+cardBack : Int -> Element a
+cardBack cardHeight =
+    column
+        [ spacing 5
+        , padding 5
+        , Border.width 4
+        , Border.rounded 10
+        , width <| px <| round <| toFloat cardHeight / cardRatio
+        , height (px cardHeight)
+        ]
+        []
+
+
 cardElement : Int -> ( Int, Card ) -> Element Msg
 cardElement cardHeight ( id, card ) =
     column
@@ -371,6 +386,11 @@ cardElement cardHeight ( id, card ) =
         , paragraph [ centerX, Font.italic, Font.size 14 ]
             [ Element.text "Some colorful flavor text that keeps going and going and going" ]
         ]
+
+
+cardListBack : Int -> List a -> Html msg
+cardListBack cardHeight cards =
+    Element.layout [] (row [ spacing 10 ] <| List.map (always <| cardBack cardHeight) cards)
 
 
 cardList : Int -> List ( Int, Card ) -> Html Msg
