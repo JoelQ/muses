@@ -293,16 +293,13 @@ viewPlaying { currentPlayer, otherPlayer } =
     div []
         [ h3 [] [ text <| otherPlayer.name ]
         , div [] [ viewScore otherPlayer.score ]
-        , h4 [] [ text "Hand" ]
         , cardListBack 210 <| Dict.toList otherPlayer.cards
-        , h4 [] [ text "Characters" ]
         , cardList 210 <| Dict.toList otherPlayer.characters
-        , h3 [] [ text <| "Me - " ++ deckName currentPlayer.deck ]
-        , div [] [ viewScore currentPlayer.score ]
-        , h4 [] [ text "Characters" ]
+        , hr [] []
         , cardList 210 <| Dict.toList currentPlayer.characters
-        , h4 [] [ text "Hand" ]
         , cardList 210 <| Dict.toList currentPlayer.cards
+        , div [] [ viewScore currentPlayer.score ]
+        , h3 [] [ text <| "Me - " ++ deckName currentPlayer.deck ]
         , button [ onClick EndTurn ] [ text "End Turn" ]
         ]
 
