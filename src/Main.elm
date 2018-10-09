@@ -298,7 +298,7 @@ viewPlaying { currentPlayer, otherPlayer } =
         , h4 [] [ text "Characters" ]
         , ul [] <| List.map viewCharacter <| Dict.toList currentPlayer.characters
         , h4 [] [ text "Hand" ]
-        , Element.layout [] (row [] <| List.map cardElement <| Dict.toList currentPlayer.cards)
+        , Element.layout [] (row [ spacing 10 ] <| List.map (cardElement 225) <| Dict.toList currentPlayer.cards)
         , button [ onClick EndTurn ] [ text "End Turn" ]
         ]
 
@@ -333,26 +333,49 @@ viewCharacter ( id, card ) =
             li [] [ text "Not Allowed" ]
 
 
-cardElement : ( Int, Card ) -> Element Msg
-cardElement ( id, card ) =
+cardRatio : Float
+cardRatio =
+    1.4
+
+
+imageRatio : Float
+imageRatio =
+    1.2
+
+
+cardImage : Int -> Element Msg
+cardImage cardHeight =
+    let
+        imageWidth =
+            round <| (toFloat cardHeight / cardRatio) / imageRatio
+
+        imageHeight =
+            round <| toFloat imageWidth / cardRatio
+
+        placeholderString =
+            String.fromInt imageWidth ++ "x" ++ String.fromInt imageHeight
+    in
+    Element.image []
+        { src = "https://via.placeholder.com/" ++ placeholderString
+        , description = "placeholder"
+        }
+
+
+cardElement : Int -> ( Int, Card ) -> Element Msg
+cardElement cardHeight ( id, card ) =
     column
         [ spacing 5
         , padding 5
-        , Border.width 5
+        , Border.width 4
         , Border.rounded 10
-        , width (px 225)
-        , height (px 300)
+        , width <| px <| round <| toFloat cardHeight / cardRatio
+        , height (px cardHeight)
         ]
         [ row [ width fill ]
             [ el [ alignLeft ] <| Element.text (cardName card)
             , el [ alignRight ] <| Element.text (progress card)
             ]
-        , el [ centerX, padding 5 ]
-            (Element.image []
-                { src = "https://via.placeholder.com/175x125"
-                , description = "placeholder"
-                }
-            )
-        , paragraph [ centerX, width (px 175), Font.italic, Font.size 14 ]
+        , el [ centerX, padding 5 ] (cardImage cardHeight)
+        , paragraph [ centerX, Font.italic, Font.size 14 ]
             [ Element.text "Some colorful flavor text that keeps going and going and going" ]
         ]
