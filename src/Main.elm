@@ -297,9 +297,9 @@ viewPlaying { currentPlayer, otherPlayer } =
         , h3 [] [ text <| "Me - " ++ deckName currentPlayer.deck ]
         , div [] [ text <| "Score: " ++ String.fromInt currentPlayer.score ]
         , h4 [] [ text "Characters" ]
-        , ul [] <| List.map viewCharacter <| Dict.toList currentPlayer.characters
+        , cardList 225 <| Dict.toList currentPlayer.characters
         , h4 [] [ text "Hand" ]
-        , Element.layout [] (row [ spacing 10 ] <| List.map (cardElement 225) <| Dict.toList currentPlayer.cards)
+        , cardList 225 <| Dict.toList currentPlayer.cards
         , button [ onClick EndTurn ] [ text "End Turn" ]
         ]
 
@@ -381,3 +381,8 @@ cardElement cardHeight ( id, card ) =
         , paragraph [ centerX, Font.italic, Font.size 14 ]
             [ Element.text "Some colorful flavor text that keeps going and going and going" ]
         ]
+
+
+cardList : Int -> List ( Int, Card ) -> Html Msg
+cardList cardHeight cards =
+    Element.layout [] (row [ spacing 10 ] <| List.map (cardElement cardHeight) cards)
