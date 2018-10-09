@@ -21,6 +21,7 @@ import Element
         , width
         )
 import Element.Border as Border
+import Element.Events as Events
 import Element.Font as Font
 import Html exposing (..)
 import Html.Events exposing (onClick)
@@ -370,6 +371,7 @@ cardElement cardHeight ( id, card ) =
         , Border.rounded 10
         , width <| px <| round <| toFloat cardHeight / cardRatio
         , height (px cardHeight)
+        , Events.onClick (PlayCard id card)
         ]
         [ row [ width fill ]
             [ el [ alignLeft ] <| Element.text (cardName card)
