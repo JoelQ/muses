@@ -132,23 +132,24 @@ cardsForDeck deck =
 
 tragedyDeck : List Card
 tragedyDeck =
-    [ OneShot "One Shot" (GeneratePoints <| MuseumPoints 10)
-    , OneShot "One Shot" (GeneratePoints <| MuseumPoints 20)
-    , OneShot "One Shot" (GeneratePoints <| MuseumPoints 30)
-    , OneShot "One Shot" (GeneratePoints <| MuseumPoints 20)
-    , OneShot "One Shot" (GeneratePoints <| MuseumPoints 10)
-    , OneShot "One Shot" (GeneratePoints <| MuseumPoints 10)
+    [ Character "Sophocles" (MuseumPoints 1)
+    , Character "Erinyes" (MuseumPoints 2)
+    , Character "Agammemnon" (MuseumPoints 3)
+    , Character "Antigone" (MuseumPoints 2)
+    , Character "Siren" (MuseumPoints 1)
+    , Character "Siren" (MuseumPoints 1)
+    , Character "Siren" (MuseumPoints 1)
     ]
 
 
 comedyDeck : List Card
 comedyDeck =
-    [ OneShot "One Shot" (GeneratePoints <| MuseumPoints 10)
-    , OneShot "One Shot" (GeneratePoints <| MuseumPoints 20)
-    , OneShot "One Shot" (GeneratePoints <| MuseumPoints 30)
-    , OneShot "One Shot" (GeneratePoints <| MuseumPoints 20)
-    , OneShot "One Shot" (GeneratePoints <| MuseumPoints 10)
-    , OneShot "One Shot" (GeneratePoints <| MuseumPoints 10)
+    [ Character "Aristophanes" (MuseumPoints 1)
+    , Character "Amphitheater" (MuseumPoints 1)
+    , Character "Amphitheater" (MuseumPoints 1)
+    , OneShot "Satyr Play" (GeneratePoints <| MuseumPoints 10)
+    , OneShot "Satyr Play" (GeneratePoints <| MuseumPoints 10)
+    , OneShot "Satyr Play" (GeneratePoints <| MuseumPoints 10)
     ]
 
 
@@ -157,15 +158,19 @@ epicPoetryDeck =
     [ Character "Atalanta" (MuseumPoints 2)
     , Character "Jason" (MuseumPoints 3)
     , Character "Theseus" (MuseumPoints 2)
+    , Character "Homer" (MuseumPoints 1)
+    , Character "Arctinus" (MuseumPoints 1)
     ]
 
 
 divinePoetryDeck : List Card
 divinePoetryDeck =
-    [ Character "Character" (MuseumPoints 1)
-    , Character "Character" (MuseumPoints 2)
-    , Character "Character" (MuseumPoints 3)
-    , Character "Character" (MuseumPoints 4)
-    , Character "Character" (MuseumPoints 5)
-    , Character "Character" (MuseumPoints 6)
+    [ Character "Hesiod" (MuseumPoints 1)
+    , Character "Prometheus" (MuseumPoints 2)
+    , Character "Artemis" (MuseumPoints 3)
+    , Character "Poseidon" (MuseumPoints 4)
+    , Character "Apollo" (MuseumPoints 5)
+    , OneShot "Hymn" (GeneratePoints <| MuseumPoints 10)
+    , OneShot "Hymn" (GeneratePoints <| MuseumPoints 10)
+    , OneShot "Hymn" (GeneratePoints <| MuseumPoints 10)
     ]
