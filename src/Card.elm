@@ -72,33 +72,47 @@ shuffle cards =
 
 
 type Deck
-    = Flashy
-    | SlowAndSteady
+    = Tragedy
+    | Comedy
+    | EpicPoetry
+    | DivinePoetry
 
 
 otherDeck : Deck -> Deck
 otherDeck deck =
     case deck of
-        SlowAndSteady ->
-            Flashy
+        Tragedy ->
+            Comedy
 
-        Flashy ->
-            SlowAndSteady
+        Comedy ->
+            EpicPoetry
+
+        EpicPoetry ->
+            DivinePoetry
+
+        DivinePoetry ->
+            Tragedy
 
 
 deckChoices : List Deck
 deckChoices =
-    [ Flashy, SlowAndSteady ]
+    [ Tragedy, Comedy, EpicPoetry, DivinePoetry ]
 
 
 deckName : Deck -> String
 deckName deck =
     case deck of
-        SlowAndSteady ->
-            "Slow and Steady"
+        Tragedy ->
+            "Melpomene (Tragedy)"
 
-        Flashy ->
-            "Flashy"
+        Comedy ->
+            "Thalia (Comedy)"
+
+        EpicPoetry ->
+            "Calliope (Epic Poetry)"
+
+        DivinePoetry ->
+            "Polyhymnia (Divine Poetry)"
 
 
 flashyDeck : List Card

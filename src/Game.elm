@@ -76,16 +76,9 @@ startGame selectedDeck p1Cards p2Cards =
 
 shuffleAndStart : Card.Deck -> Random.Generator GameState
 shuffleAndStart deck =
-    case deck of
-        Card.Flashy ->
-            Random.map2 (startGame deck)
-                (Card.shuffle Card.flashyDeck)
-                (Card.shuffle Card.slowAndSteadyDeck)
-
-        Card.SlowAndSteady ->
-            Random.map2 (startGame deck)
-                (Card.shuffle Card.slowAndSteadyDeck)
-                (Card.shuffle Card.flashyDeck)
+    Random.map2 (startGame deck)
+        (Card.shuffle Card.flashyDeck)
+        (Card.shuffle Card.slowAndSteadyDeck)
 
 
 removeFromHand : Int -> GameState -> GameState
