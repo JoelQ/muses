@@ -76,6 +76,7 @@ update msg model =
             model
                 |> Game.map Game.playCurrentCharacters
                 |> Game.andThen Game.checkWin
+                |> Game.map Game.drawCard
                 |> Game.map Game.swapPlayers
                 |> withNoCmd
 
@@ -122,11 +123,11 @@ viewPlaying { currentPlayer, otherPlayer } =
     div []
         [ h3 [] [ text <| otherPlayer.name ++ " " ++ Card.deckName otherPlayer.deck ]
         , div [] [ viewScore otherPlayer.score ]
-        , cardListBack 210 <| Dict.toList otherPlayer.cards
+        , cardListBack 210 <| Dict.toList otherPlayer.hand
         , cardList 210 <| Dict.toList otherPlayer.characters
         , hr [] []
         , cardList 210 <| Dict.toList currentPlayer.characters
-        , cardList 210 <| Dict.toList currentPlayer.cards
+        , cardList 210 <| Dict.toList currentPlayer.hand
         , div [] [ viewScore currentPlayer.score ]
         , h3 [] [ text <| "Me - " ++ Card.deckName currentPlayer.deck ]
         , button [ onClick EndTurn ] [ text "End Turn" ]

@@ -3,6 +3,7 @@ module Game exposing
     , GameState
     , andThen
     , checkWin
+    , drawCard
     , map
     , playCard
     , playCurrentCharacters
@@ -87,6 +88,11 @@ playCurrentCharacters =
 swapPlayers : GameState -> GameState
 swapPlayers { currentPlayer, otherPlayer } =
     { currentPlayer = otherPlayer, otherPlayer = currentPlayer }
+
+
+drawCard : GameState -> GameState
+drawCard =
+    modifyCurrentPlayer Player.drawCard
 
 
 modifyCurrentPlayer : (Player -> Player) -> GameState -> GameState

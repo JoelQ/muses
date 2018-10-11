@@ -2,6 +2,7 @@ module Player exposing
     ( Player
     , addPointsFromCharacters
     , buildInitial
+    , drawCard
     , increaseScore
     , playCharacter
     , randomOpponent
@@ -18,7 +19,8 @@ import Random
 type alias Player =
     { name : String
     , deck : Card.Deck
-    , cards : Dict Int Card
+    , cardPile : List Card.WithId
+    , hand : Dict Int Card
     , score : Int
     , characters : Dict Int Card
     }
@@ -28,9 +30,20 @@ type alias Player =
 -- BUILD
 
 
+cardsDealt : Int
+cardsDealt =
+    3
+
+
 buildInitial : String -> Card.Deck -> List Card.WithId -> Player
 buildInitial name deck cards =
-    Player name deck (Dict.fromList cards) 0 Dict.empty
+    { name = name
+    , deck = deck
+    , cardPile = List.drop cardsDealt cards
+    , hand = Dict.fromList (List.take cardsDealt cards)
+    , score = 0
+    , characters = Dict.empty
+    }
 
 
 randomPlayer : String -> Card.Deck -> Random.Generator Player
@@ -69,4 +82,14 @@ playCharacter id card player =
 
 removeFromHand : Int -> Player -> Player
 removeFromHand cardId player =
-    { player | cards = Dict.remove cardId player.cards }
+    { player | hand = Dict.remove cardId player.hand }
+
+
+drawCard : Player -> Player
+drawCard player =
+    case player.cardPile of
+        [] ->
+            player
+
+        ( id, card ) :: rest ->
+            { player | cardPile = rest, hand = Dict.insert id card player.hand }
