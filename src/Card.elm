@@ -3,15 +3,14 @@ module Card exposing
     , Deck(..)
     , Power(..)
     , WithId
+    , cardsForDeck
     , deckChoices
     , deckName
-    , flashyDeck
     , magnitude
     , magnitudeString
     , name
     , opponentDeck
     , shuffle
-    , slowAndSteadyDeck
     )
 
 import Array
@@ -25,8 +24,8 @@ type alias WithId =
 
 
 type Card
-    = Character MuseumPoints
-    | OneShot Power
+    = Character String MuseumPoints
+    | OneShot String Power
 
 
 type Power
@@ -36,20 +35,20 @@ type Power
 name : Card -> String
 name card =
     case card of
-        Character _ ->
-            "Character"
+        Character n _ ->
+            n
 
-        OneShot _ ->
-            "OneShot"
+        OneShot n _ ->
+            n
 
 
 magnitude : Card -> MuseumPoints
 magnitude card =
     case card of
-        Character points ->
+        Character _ points ->
             points
 
-        OneShot (GeneratePoints points) ->
+        OneShot _ (GeneratePoints points) ->
             points
 
 
@@ -109,23 +108,58 @@ deckName deck =
             "Polyhymnia (Divine Poetry)"
 
 
-flashyDeck : List Card
-flashyDeck =
-    [ OneShot (GeneratePoints <| MuseumPoints 10)
-    , OneShot (GeneratePoints <| MuseumPoints 20)
-    , OneShot (GeneratePoints <| MuseumPoints 30)
-    , OneShot (GeneratePoints <| MuseumPoints 20)
-    , OneShot (GeneratePoints <| MuseumPoints 10)
-    , OneShot (GeneratePoints <| MuseumPoints 10)
+cardsForDeck : Deck -> List Card
+cardsForDeck deck =
+    case deck of
+        Tragedy ->
+            tragedyDeck
+
+        Comedy ->
+            comedyDeck
+
+        EpicPoetry ->
+            epicPoetryDeck
+
+        DivinePoetry ->
+            divinePoetryDeck
+
+
+tragedyDeck : List Card
+tragedyDeck =
+    [ OneShot "One Shot" (GeneratePoints <| MuseumPoints 10)
+    , OneShot "One Shot" (GeneratePoints <| MuseumPoints 20)
+    , OneShot "One Shot" (GeneratePoints <| MuseumPoints 30)
+    , OneShot "One Shot" (GeneratePoints <| MuseumPoints 20)
+    , OneShot "One Shot" (GeneratePoints <| MuseumPoints 10)
+    , OneShot "One Shot" (GeneratePoints <| MuseumPoints 10)
     ]
 
 
-slowAndSteadyDeck : List Card
-slowAndSteadyDeck =
-    [ Character (MuseumPoints 1)
-    , Character (MuseumPoints 2)
-    , Character (MuseumPoints 3)
-    , Character (MuseumPoints 4)
-    , Character (MuseumPoints 5)
-    , Character (MuseumPoints 6)
+comedyDeck : List Card
+comedyDeck =
+    [ OneShot "One Shot" (GeneratePoints <| MuseumPoints 10)
+    , OneShot "One Shot" (GeneratePoints <| MuseumPoints 20)
+    , OneShot "One Shot" (GeneratePoints <| MuseumPoints 30)
+    , OneShot "One Shot" (GeneratePoints <| MuseumPoints 20)
+    , OneShot "One Shot" (GeneratePoints <| MuseumPoints 10)
+    , OneShot "One Shot" (GeneratePoints <| MuseumPoints 10)
+    ]
+
+
+epicPoetryDeck : List Card
+epicPoetryDeck =
+    [ Character "Atalanta" (MuseumPoints 2)
+    , Character "Jason" (MuseumPoints 3)
+    , Character "Theseus" (MuseumPoints 2)
+    ]
+
+
+divinePoetryDeck : List Card
+divinePoetryDeck =
+    [ Character "Character" (MuseumPoints 1)
+    , Character "Character" (MuseumPoints 2)
+    , Character "Character" (MuseumPoints 3)
+    , Character "Character" (MuseumPoints 4)
+    , Character "Character" (MuseumPoints 5)
+    , Character "Character" (MuseumPoints 6)
     ]

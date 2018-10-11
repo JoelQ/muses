@@ -4,12 +4,15 @@ module Player exposing
     , buildInitial
     , increaseScore
     , playCharacter
+    , randomOpponent
+    , randomPlayer
     , removeFromHand
     )
 
 import Card exposing (Card)
 import Dict exposing (Dict)
 import MuseumPoints
+import Random
 
 
 type alias Player =
@@ -19,6 +22,26 @@ type alias Player =
     , score : Int
     , characters : Dict Int Card
     }
+
+
+
+-- BUILD
+
+
+buildInitial : String -> Card.Deck -> List Card.WithId -> Player
+buildInitial name deck cards =
+    Player name deck (Dict.fromList cards) 0 Dict.empty
+
+
+randomPlayer : String -> Card.Deck -> Random.Generator Player
+randomPlayer name deck =
+    Random.map (buildInitial name deck) (Card.shuffle <| Card.cardsForDeck deck)
+
+
+randomOpponent : String -> Card.Deck -> Random.Generator Player
+randomOpponent name otherDeck =
+    Card.opponentDeck otherDeck
+        |> Random.andThen (\deck -> randomPlayer name deck)
 
 
 scoreFromCharacters : Player -> Int
@@ -42,11 +65,6 @@ increaseScore n player =
 playCharacter : Int -> Card -> Player -> Player
 playCharacter id card player =
     { player | characters = Dict.insert id card player.characters }
-
-
-buildInitial : String -> Card.Deck -> List Card.WithId -> Player
-buildInitial name deck cards =
-    Player name deck (Dict.fromList cards) 0 Dict.empty
 
 
 removeFromHand : Int -> Player -> Player

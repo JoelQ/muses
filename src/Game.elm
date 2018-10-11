@@ -60,26 +60,18 @@ type alias GameState =
 playCard : Card.WithId -> GameState -> GameState
 playCard ( id, card ) state =
     case card of
-        Card.OneShot (Card.GeneratePoints (MuseumPoints n)) ->
+        Card.OneShot _ (Card.GeneratePoints (MuseumPoints n)) ->
             modifyCurrentPlayer (Player.increaseScore n) state
 
-        Card.Character _ ->
+        Card.Character _ _ ->
             modifyCurrentPlayer (Player.playCharacter id card) state
 
 
-startGame : Card.Deck -> Card.Deck -> List Card.WithId -> List Card.WithId -> GameState
-startGame p1Deck p2Deck p1Cards p2Cards =
-    { currentPlayer = Player.buildInitial "Player 1" p1Deck p1Cards
-    , otherPlayer = Player.buildInitial "Player 2" p2Deck p2Cards
-    }
-
-
 shuffleAndStart : Card.Deck -> Random.Generator GameState
-shuffleAndStart deck =
-    Random.map3 (startGame deck)
-        (Card.opponentDeck deck)
-        (Card.shuffle Card.flashyDeck)
-        (Card.shuffle Card.slowAndSteadyDeck)
+shuffleAndStart myDeck =
+    Random.map2 GameState
+        (Player.randomPlayer "Player 1" myDeck)
+        (Player.randomOpponent "Player 2" myDeck)
 
 
 removeFromHand : Int -> GameState -> GameState
