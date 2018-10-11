@@ -79,7 +79,13 @@ type Deck
 
 opponentDeck : Deck -> Random.Generator Deck
 opponentDeck myDeck =
-    Random.uniform myDeck (otherDecks myDeck)
+    case otherDecks myDeck of
+        -- play a mirror if there are no other decks
+        [] ->
+            Random.constant myDeck
+
+        first :: rest ->
+            Random.uniform first rest
 
 
 otherDecks : Deck -> List Deck
