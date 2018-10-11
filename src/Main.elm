@@ -120,7 +120,7 @@ choice deck =
 viewPlaying : GameState -> Html Msg
 viewPlaying { currentPlayer, otherPlayer } =
     div []
-        [ h3 [] [ text <| otherPlayer.name ]
+        [ h3 [] [ text <| otherPlayer.name ++ " " ++ Card.deckName otherPlayer.deck ]
         , div [] [ viewScore otherPlayer.score ]
         , cardListBack 210 <| Dict.toList otherPlayer.cards
         , cardList 210 <| Dict.toList otherPlayer.characters

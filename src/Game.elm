@@ -67,16 +67,17 @@ playCard ( id, card ) state =
             modifyCurrentPlayer (Player.playCharacter id card) state
 
 
-startGame : Card.Deck -> List Card.WithId -> List Card.WithId -> GameState
-startGame selectedDeck p1Cards p2Cards =
-    { currentPlayer = Player.buildInitial "Player 1" selectedDeck p1Cards
-    , otherPlayer = Player.buildInitial "Player 2" (Card.otherDeck selectedDeck) p2Cards
+startGame : Card.Deck -> Card.Deck -> List Card.WithId -> List Card.WithId -> GameState
+startGame p1Deck p2Deck p1Cards p2Cards =
+    { currentPlayer = Player.buildInitial "Player 1" p1Deck p1Cards
+    , otherPlayer = Player.buildInitial "Player 2" p2Deck p2Cards
     }
 
 
 shuffleAndStart : Card.Deck -> Random.Generator GameState
 shuffleAndStart deck =
-    Random.map2 (startGame deck)
+    Random.map3 (startGame deck)
+        (Card.opponentDeck deck)
         (Card.shuffle Card.flashyDeck)
         (Card.shuffle Card.slowAndSteadyDeck)
 

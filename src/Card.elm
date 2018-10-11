@@ -9,7 +9,7 @@ module Card exposing
     , magnitude
     , magnitudeString
     , name
-    , otherDeck
+    , opponentDeck
     , shuffle
     , slowAndSteadyDeck
     )
@@ -78,20 +78,14 @@ type Deck
     | DivinePoetry
 
 
-otherDeck : Deck -> Deck
-otherDeck deck =
-    case deck of
-        Tragedy ->
-            Comedy
+opponentDeck : Deck -> Random.Generator Deck
+opponentDeck myDeck =
+    Random.uniform myDeck (otherDecks myDeck)
 
-        Comedy ->
-            EpicPoetry
 
-        EpicPoetry ->
-            DivinePoetry
-
-        DivinePoetry ->
-            Tragedy
+otherDecks : Deck -> List Deck
+otherDecks deck =
+    List.filter (\choice -> choice /= deck) deckChoices
 
 
 deckChoices : List Deck
