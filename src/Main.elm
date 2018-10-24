@@ -9,6 +9,7 @@ import Element
         , alignLeft
         , alignRight
         , centerX
+        , centerY
         , column
         , el
         , fill
@@ -23,7 +24,7 @@ import Element
 import Element.Border as Border
 import Element.Events as Events
 import Element.Font as Font
-import Game exposing (Game, GameState)
+import Game exposing (Game, GameSlot, GameState)
 import Html exposing (..)
 import Html.Attributes exposing (max, value)
 import Html.Events exposing (onClick)
@@ -119,19 +120,39 @@ choice deck =
 
 
 viewPlaying : GameState -> Html Msg
-viewPlaying { currentPlayer, otherPlayer } =
+viewPlaying { currentPlayer, otherPlayer, slots } =
     div []
         [ h3 [] [ text <| otherPlayer.name ++ " " ++ Card.deckName otherPlayer.deck ]
         , div [] [ viewScore otherPlayer.score ]
         , cardListBack 210 <| Dict.toList otherPlayer.hand
-        , cardList 210 <| Dict.toList otherPlayer.characters
         , hr [] []
-        , cardList 210 <| Dict.toList currentPlayer.characters
+        , gameSlots 210 slots
+        , hr [] []
         , cardList 210 <| Dict.toList currentPlayer.hand
         , div [] [ viewScore currentPlayer.score ]
         , h3 [] [ text <| "Me - " ++ Card.deckName currentPlayer.deck ]
         , button [ onClick EndTurn ] [ text "End Turn" ]
         ]
+
+
+gameSlots : Int -> List GameSlot -> Html Msg
+gameSlots cardHeight slots =
+    Element.layout [] <|
+        row [ spacing 10 ] <|
+            List.map (gameSlot cardHeight) slots
+
+
+gameSlot : Int -> GameSlot -> Element Msg
+gameSlot cardHeight slot =
+    case slot.card of
+        Just card ->
+            cardOutline cardHeight [] (cardContents cardHeight card)
+
+        Nothing ->
+            cardOutline cardHeight
+                [ Border.dashed ]
+                [ el [ centerX, centerY ] (Element.text <| Game.slotName slot)
+                ]
 
 
 viewScore : Int -> Html a
@@ -153,7 +174,7 @@ imageRatio =
     1.2
 
 
-cardImage : Int -> Element Msg
+cardImage : Int -> Element a
 cardImage cardHeight =
     let
         imageWidth =
@@ -173,36 +194,45 @@ cardImage cardHeight =
 
 cardBack : Int -> Element a
 cardBack cardHeight =
-    column
-        [ spacing 5
-        , padding 5
-        , Border.width 4
-        , Border.rounded 10
-        , width <| px <| round <| toFloat cardHeight / cardRatio
-        , height (px cardHeight)
+    cardOutline cardHeight [] []
+
+
+cardOutline :
+    Int
+    -> List (Element.Attribute msg)
+    -> List (Element msg)
+    -> Element msg
+cardOutline cardHeight extrAttrs contents =
+    let
+        defaultAttrs =
+            [ spacing 5
+            , padding 5
+            , Border.width 4
+            , Border.rounded 10
+            , width <| px <| round <| toFloat cardHeight / cardRatio
+            , height (px cardHeight)
+            ]
+    in
+    column (defaultAttrs ++ extrAttrs) contents
+
+
+cardContents : Int -> Card -> List (Element a)
+cardContents cardHeight card =
+    [ row [ width fill ]
+        [ el [ alignLeft ] <| Element.text (Card.name card)
+        , el [ alignRight ] <| Element.text (Card.magnitudeString card)
         ]
-        []
+    , el [ centerX, padding 5 ] (cardImage cardHeight)
+    , paragraph [ centerX, Font.italic, Font.size 14 ]
+        [ Element.text "Some colorful flavor text that keeps going and going and going" ]
+    ]
 
 
 cardElement : Int -> Card.WithId -> Element Msg
 cardElement cardHeight ( id, card ) =
-    column
-        [ spacing 5
-        , padding 5
-        , Border.width 4
-        , Border.rounded 10
-        , width <| px <| round <| toFloat cardHeight / cardRatio
-        , height (px cardHeight)
-        , Events.onClick (PlayCard id card)
-        ]
-        [ row [ width fill ]
-            [ el [ alignLeft ] <| Element.text (Card.name card)
-            , el [ alignRight ] <| Element.text (Card.magnitudeString card)
-            ]
-        , el [ centerX, padding 5 ] (cardImage cardHeight)
-        , paragraph [ centerX, Font.italic, Font.size 14 ]
-            [ Element.text "Some colorful flavor text that keeps going and going and going" ]
-        ]
+    cardOutline cardHeight
+        [ Events.onClick (PlayCard id card) ]
+        (cardContents cardHeight card)
 
 
 cardListBack : Int -> List a -> Html msg

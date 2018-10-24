@@ -1,5 +1,6 @@
 module Game exposing
     ( Game(..)
+    , GameSlot
     , GameState
     , andThen
     , checkWin
@@ -10,10 +11,11 @@ module Game exposing
     , removeFromHand
     , resetPlayedCardCount
     , shuffleAndStart
+    , slotName
     , swapPlayers
     )
 
-import Card
+import Card exposing (Card)
 import MuseumPoints exposing (MuseumPoints(..))
 import Player exposing (Player)
 import Random
@@ -53,9 +55,49 @@ map function =
 -- GAME STATE
 
 
+type alias GameSlot =
+    { requirements : SlotRequirement, card : Maybe Card }
+
+
+type SlotRequirement
+    = Female
+    | GreatPoet
+    | Seafarer
+    | Underworld
+    | Ruler
+    | Beast
+    | Small
+
+
+slotName : GameSlot -> String
+slotName { requirements } =
+    case requirements of
+        Female ->
+            "Female"
+
+        GreatPoet ->
+            "Great Poet"
+
+        Seafarer ->
+            "Seafarer"
+
+        Underworld ->
+            "Underworld"
+
+        Ruler ->
+            "Ruler"
+
+        Beast ->
+            "Beast"
+
+        Small ->
+            "Small"
+
+
 type alias GameState =
     { currentPlayer : Player
     , otherPlayer : Player
+    , slots : List GameSlot
     }
 
 
@@ -82,9 +124,10 @@ executeCardEffects ( id, card ) state =
 
 shuffleAndStart : Card.Deck -> Random.Generator GameState
 shuffleAndStart myDeck =
-    Random.map2 GameState
+    Random.map3 GameState
         (Player.randomPlayer "Player 1" myDeck)
         (Player.randomOpponent "Player 2" myDeck)
+        (Random.constant [ GameSlot Female Nothing, GameSlot Small Nothing ])
 
 
 removeFromHand : Int -> GameState -> GameState
@@ -98,8 +141,11 @@ playCurrentCharacters =
 
 
 swapPlayers : GameState -> GameState
-swapPlayers { currentPlayer, otherPlayer } =
-    { currentPlayer = otherPlayer, otherPlayer = currentPlayer }
+swapPlayers state =
+    { state
+        | currentPlayer = state.otherPlayer
+        , otherPlayer = state.currentPlayer
+    }
 
 
 drawCard : GameState -> GameState
