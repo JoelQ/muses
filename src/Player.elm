@@ -8,6 +8,7 @@ module Player exposing
     , randomOpponent
     , randomPlayer
     , removeFromHand
+    , resetPlayedCardCount
     )
 
 import Card exposing (Card)
@@ -23,6 +24,7 @@ type alias Player =
     , hand : Dict Int Card
     , score : Int
     , characters : Dict Int Card
+    , cardsPlayed : Int
     }
 
 
@@ -43,6 +45,7 @@ buildInitial name deck cards =
     , hand = Dict.fromList (List.take cardsDealt cards)
     , score = 0
     , characters = Dict.empty
+    , cardsPlayed = 0
     }
 
 
@@ -77,12 +80,20 @@ increaseScore n player =
 
 playCharacter : Int -> Card -> Player -> Player
 playCharacter id card player =
-    { player | characters = Dict.insert id card player.characters }
+    { player
+        | characters = Dict.insert id card player.characters
+        , cardsPlayed = player.cardsPlayed + 1
+    }
 
 
 removeFromHand : Int -> Player -> Player
 removeFromHand cardId player =
     { player | hand = Dict.remove cardId player.hand }
+
+
+resetPlayedCardCount : Player -> Player
+resetPlayedCardCount player =
+    { player | cardsPlayed = 0 }
 
 
 drawCard : Player -> Player

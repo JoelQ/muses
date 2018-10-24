@@ -8,6 +8,7 @@ module Game exposing
     , playCard
     , playCurrentCharacters
     , removeFromHand
+    , resetPlayedCardCount
     , shuffleAndStart
     , swapPlayers
     )
@@ -59,7 +60,18 @@ type alias GameState =
 
 
 playCard : Card.WithId -> GameState -> GameState
-playCard ( id, card ) state =
+playCard ( cardId, card ) state =
+    if state.currentPlayer.cardsPlayed == 0 then
+        state
+            |> executeCardEffects ( cardId, card )
+            |> removeFromHand cardId
+
+    else
+        state
+
+
+executeCardEffects : Card.WithId -> GameState -> GameState
+executeCardEffects ( id, card ) state =
     case card of
         Card.OneShot _ (Card.GeneratePoints (MuseumPoints n)) ->
             modifyCurrentPlayer (Player.increaseScore n) state
@@ -93,6 +105,11 @@ swapPlayers { currentPlayer, otherPlayer } =
 drawCard : GameState -> GameState
 drawCard =
     modifyCurrentPlayer Player.drawCard
+
+
+resetPlayedCardCount : GameState -> GameState
+resetPlayedCardCount =
+    modifyCurrentPlayer Player.resetPlayedCardCount
 
 
 modifyCurrentPlayer : (Player -> Player) -> GameState -> GameState

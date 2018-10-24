@@ -77,13 +77,13 @@ update msg model =
                 |> Game.map Game.playCurrentCharacters
                 |> Game.andThen Game.checkWin
                 |> Game.map Game.drawCard
+                |> Game.map Game.resetPlayedCardCount
                 |> Game.map Game.swapPlayers
                 |> withNoCmd
 
         PlayCard cardId card ->
             model
                 |> Game.map (Game.playCard ( cardId, card ))
-                |> Game.map (Game.removeFromHand cardId)
                 |> Game.andThen Game.checkWin
                 |> withNoCmd
 
