@@ -104,9 +104,14 @@ type alias GameState =
 playCard : Card.WithId -> GameState -> GameState
 playCard ( cardId, card ) state =
     if state.currentPlayer.cardsPlayed == 0 then
-        state
-            |> executeCardEffects ( cardId, card )
-            |> removeFromHand cardId
+        case card of
+            Card.OneShot _ _ ->
+                state
+                    |> executeCardEffects ( cardId, card )
+                    |> removeFromHand cardId
+
+            Card.Character _ _ ->
+                modifyCurrentPlayer (Player.selectCard cardId) state
 
     else
         state

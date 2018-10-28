@@ -128,7 +128,7 @@ viewPlaying { currentPlayer, otherPlayer, slots } =
         , hr [] []
         , gameSlots 210 slots
         , hr [] []
-        , cardList 210 <| Dict.toList currentPlayer.hand
+        , cardList 210 currentPlayer.selected <| Dict.toList currentPlayer.hand
         , div [] [ viewScore currentPlayer.score ]
         , h3 [] [ text <| "Me - " ++ Card.deckName currentPlayer.deck ]
         , button [ onClick EndTurn ] [ text "End Turn" ]
@@ -228,11 +228,20 @@ cardContents cardHeight card =
     ]
 
 
-cardElement : Int -> Card.WithId -> Element Msg
-cardElement cardHeight ( id, card ) =
+cardElement : Int -> Maybe Int -> Card.WithId -> Element Msg
+cardElement cardHeight selected ( id, card ) =
     cardOutline cardHeight
-        [ Events.onClick (PlayCard id card) ]
+        [ Events.onClick (PlayCard id card), borderColor selected id ]
         (cardContents cardHeight card)
+
+
+borderColor : Maybe Int -> Int -> Element.Attribute a
+borderColor selected currentId =
+    if selected == Just currentId then
+        Border.color (Element.rgb 0 1 0)
+
+    else
+        Border.color (Element.rgb 0 0 0)
 
 
 cardListBack : Int -> List a -> Html msg
@@ -240,6 +249,9 @@ cardListBack cardHeight cards =
     Element.layout [] (row [ spacing 10 ] <| List.map (always <| cardBack cardHeight) cards)
 
 
-cardList : Int -> List Card.WithId -> Html Msg
-cardList cardHeight cards =
-    Element.layout [] (row [ spacing 10 ] <| List.map (cardElement cardHeight) cards)
+cardList : Int -> Maybe Int -> List Card.WithId -> Html Msg
+cardList cardHeight selected cards =
+    Element.layout []
+        (row [ spacing 10 ] <|
+            List.map (cardElement cardHeight selected) cards
+        )
