@@ -7,6 +7,7 @@ module Game exposing
     , drawCard
     , map
     , playCard
+    , playCardToSlot
     , playCurrentCharacters
     , removeFromHand
     , resetPlayedCardCount
@@ -87,6 +88,24 @@ playCard ( cardId, card ) state =
         state
 
 
+addCardToSlot : Card -> GameSlot -> List GameSlot -> List GameSlot
+addCardToSlot card slot =
+    List.map
+        (\s ->
+            if s.requirements == slot.requirements then
+                { s | card = Just card }
+
+            else
+                s
+        )
+
+
+playCardToSlot : Card.WithId -> GameSlot -> GameState -> GameState
+playCardToSlot ( cardId, card ) slot state =
+    { state | slots = addCardToSlot card slot state.slots }
+        |> modifyCurrentPlayer (Player.playCharacter cardId)
+
+
 executeCardEffects : Card.WithId -> GameState -> GameState
 executeCardEffects ( id, card ) state =
     case card of
@@ -94,7 +113,7 @@ executeCardEffects ( id, card ) state =
             modifyCurrentPlayer (Player.increaseScore n) state
 
         Card.Character _ _ _ ->
-            modifyCurrentPlayer (Player.playCharacter id card) state
+            state
 
 
 shuffleAndStart : Card.Deck -> Random.Generator GameState

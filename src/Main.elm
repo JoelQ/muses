@@ -41,6 +41,7 @@ type Msg
     = SelectDeck Card.Deck
     | StartPlaying GameState
     | PlayCard Int Card
+    | PlayCardToSlot Int Card GameSlot
     | EndTurn
 
 
@@ -86,6 +87,11 @@ update msg model =
             model
                 |> Game.map (Game.playCard ( cardId, card ))
                 |> Game.andThen Game.checkWin
+                |> withNoCmd
+
+        PlayCardToSlot cardId card slot ->
+            model
+                |> Game.map (Game.playCardToSlot ( cardId, card ) slot)
                 |> withNoCmd
 
 
@@ -135,14 +141,14 @@ viewPlaying { currentPlayer, otherPlayer, slots } =
         ]
 
 
-gameSlots : Int -> Maybe Card -> List GameSlot -> Html Msg
+gameSlots : Int -> Maybe Card.WithId -> List GameSlot -> Html Msg
 gameSlots cardHeight selected slots =
     Element.layout [] <|
         row [ spacing 10 ] <|
             List.map (gameSlot cardHeight selected) slots
 
 
-gameSlot : Int -> Maybe Card -> GameSlot -> Element Msg
+gameSlot : Int -> Maybe Card.WithId -> GameSlot -> Element Msg
 gameSlot cardHeight selected slot =
     case slot.card of
         Just card ->
@@ -150,9 +156,9 @@ gameSlot cardHeight selected slot =
 
         Nothing ->
             case selected of
-                Just (Character _ _ traits) ->
+                Just ( id, (Character _ _ traits) as card ) ->
                     if List.member slot.requirements traits then
-                        selectableSlot cardHeight slot
+                        selectableSlot cardHeight id card slot
 
                     else
                         emptySlot cardHeight slot
@@ -161,10 +167,13 @@ gameSlot cardHeight selected slot =
                     emptySlot cardHeight slot
 
 
-selectableSlot : Int -> GameSlot -> Element a
-selectableSlot cardHeight slot =
+selectableSlot : Int -> Int -> Card -> GameSlot -> Element Msg
+selectableSlot cardHeight id card slot =
     cardOutline cardHeight
-        [ Border.dashed, Border.color (Element.rgb 0 1 0) ]
+        [ Border.dashed
+        , Border.color (Element.rgb 0 1 0)
+        , Events.onClick (PlayCardToSlot id card slot)
+        ]
         [ el [ centerX, centerY ] (Element.text <| Game.slotName slot)
         ]
 

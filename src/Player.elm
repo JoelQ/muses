@@ -82,11 +82,12 @@ increaseScore n player =
     { player | score = player.score + n }
 
 
-playCharacter : Int -> Card -> Player -> Player
-playCharacter id card player =
+playCharacter : Int -> Player -> Player
+playCharacter cardId player =
     { player
-        | characters = Dict.insert id card player.characters
+        | hand = Dict.remove cardId player.hand
         , cardsPlayed = player.cardsPlayed + 1
+        , selected = Nothing
     }
 
 
@@ -115,7 +116,11 @@ drawCard player =
             { player | cardPile = rest, hand = Dict.insert id card player.hand }
 
 
-selectedCard : Player -> Maybe Card
+selectedCard : Player -> Maybe Card.WithId
 selectedCard player =
     player.selected
-        |> Maybe.andThen (\id -> Dict.get id player.hand)
+        |> Maybe.andThen
+            (\id ->
+                Dict.get id player.hand
+                    |> Maybe.andThen (\card -> Just ( id, card ))
+            )
