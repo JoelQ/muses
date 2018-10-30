@@ -2,6 +2,7 @@ module Card exposing
     ( Card(..)
     , Deck(..)
     , Power(..)
+    , Trait(..)
     , WithId
     , cardsForDeck
     , deckChoices
@@ -11,6 +12,7 @@ module Card exposing
     , name
     , opponentDeck
     , shuffle
+    , traitName
     )
 
 import Array
@@ -24,8 +26,43 @@ type alias WithId =
 
 
 type Card
-    = Character String MuseumPoints
+    = Character String MuseumPoints (List Trait)
     | OneShot String Power
+
+
+type Trait
+    = Female
+    | GreatPoet
+    | Seafarer
+    | Underworld
+    | Ruler
+    | Beast
+    | Small
+
+
+traitName : Trait -> String
+traitName trait =
+    case trait of
+        Female ->
+            "Female"
+
+        GreatPoet ->
+            "Great Poet"
+
+        Seafarer ->
+            "Seafarer"
+
+        Underworld ->
+            "Underworld"
+
+        Ruler ->
+            "Ruler"
+
+        Beast ->
+            "Beast"
+
+        Small ->
+            "Small"
 
 
 type Power
@@ -35,7 +72,7 @@ type Power
 name : Card -> String
 name card =
     case card of
-        Character n _ ->
+        Character n _ _ ->
             n
 
         OneShot n _ ->
@@ -45,7 +82,7 @@ name card =
 magnitude : Card -> MuseumPoints
 magnitude card =
     case card of
-        Character _ points ->
+        Character _ points _ ->
             points
 
         OneShot _ (GeneratePoints points) ->
@@ -132,21 +169,21 @@ cardsForDeck deck =
 
 tragedyDeck : List Card
 tragedyDeck =
-    [ Character "Sophocles" (MuseumPoints 1)
-    , Character "Erinyes" (MuseumPoints 2)
-    , Character "Agammemnon" (MuseumPoints 3)
-    , Character "Antigone" (MuseumPoints 2)
-    , Character "Siren" (MuseumPoints 1)
-    , Character "Siren" (MuseumPoints 1)
-    , Character "Siren" (MuseumPoints 1)
+    [ Character "Sophocles" (MuseumPoints 1) [ GreatPoet ]
+    , Character "Erinyes" (MuseumPoints 2) []
+    , Character "Agammemnon" (MuseumPoints 3) [ Ruler ]
+    , Character "Antigone" (MuseumPoints 2) [ Female ]
+    , Character "Siren" (MuseumPoints 1) [ Female ]
+    , Character "Siren" (MuseumPoints 1) [ Female ]
+    , Character "Siren" (MuseumPoints 1) [ Female ]
     ]
 
 
 comedyDeck : List Card
 comedyDeck =
-    [ Character "Aristophanes" (MuseumPoints 1)
-    , Character "Amphitheater" (MuseumPoints 1)
-    , Character "Amphitheater" (MuseumPoints 1)
+    [ Character "Aristophanes" (MuseumPoints 1) [ GreatPoet ]
+    , Character "Amphitheater" (MuseumPoints 1) []
+    , Character "Amphitheater" (MuseumPoints 1) []
     , OneShot "Satyr Play" (GeneratePoints <| MuseumPoints 10)
     , OneShot "Satyr Play" (GeneratePoints <| MuseumPoints 10)
     , OneShot "Satyr Play" (GeneratePoints <| MuseumPoints 10)
@@ -155,21 +192,21 @@ comedyDeck =
 
 epicPoetryDeck : List Card
 epicPoetryDeck =
-    [ Character "Atalanta" (MuseumPoints 2)
-    , Character "Jason" (MuseumPoints 3)
-    , Character "Theseus" (MuseumPoints 2)
-    , Character "Homer" (MuseumPoints 1)
-    , Character "Arctinus" (MuseumPoints 1)
+    [ Character "Atalanta" (MuseumPoints 2) [ Female, Seafarer ]
+    , Character "Jason" (MuseumPoints 3) [ Seafarer ]
+    , Character "Theseus" (MuseumPoints 2) [ Seafarer, Underworld ]
+    , Character "Homer" (MuseumPoints 1) [ GreatPoet ]
+    , Character "Arctinus" (MuseumPoints 1) [ GreatPoet ]
     ]
 
 
 divinePoetryDeck : List Card
 divinePoetryDeck =
-    [ Character "Hesiod" (MuseumPoints 1)
-    , Character "Prometheus" (MuseumPoints 2)
-    , Character "Artemis" (MuseumPoints 3)
-    , Character "Poseidon" (MuseumPoints 4)
-    , Character "Apollo" (MuseumPoints 5)
+    [ Character "Hesiod" (MuseumPoints 1) [ GreatPoet ]
+    , Character "Prometheus" (MuseumPoints 2) []
+    , Character "Artemis" (MuseumPoints 3) [ Female ]
+    , Character "Poseidon" (MuseumPoints 4) [ Seafarer ]
+    , Character "Apollo" (MuseumPoints 5) []
     , OneShot "Hymn" (GeneratePoints <| MuseumPoints 10)
     , OneShot "Hymn" (GeneratePoints <| MuseumPoints 10)
     , OneShot "Hymn" (GeneratePoints <| MuseumPoints 10)

@@ -10,6 +10,7 @@ module Player exposing
     , removeFromHand
     , resetPlayedCardCount
     , selectCard
+    , selectedCard
     )
 
 import Card exposing (Card)
@@ -112,3 +113,9 @@ drawCard player =
 
         ( id, card ) :: rest ->
             { player | cardPile = rest, hand = Dict.insert id card player.hand }
+
+
+selectedCard : Player -> Maybe Card
+selectedCard player =
+    player.selected
+        |> Maybe.andThen (\id -> Dict.get id player.hand)

@@ -126,7 +126,7 @@ viewPlaying { currentPlayer, otherPlayer, slots } =
         , div [] [ viewScore otherPlayer.score ]
         , cardListBack 210 <| Dict.toList otherPlayer.hand
         , hr [] []
-        , gameSlots 210 slots
+        , gameSlots 210 (Player.selectedCard currentPlayer) slots
         , hr [] []
         , cardList 210 currentPlayer.selected <| Dict.toList currentPlayer.hand
         , div [] [ viewScore currentPlayer.score ]
@@ -135,24 +135,46 @@ viewPlaying { currentPlayer, otherPlayer, slots } =
         ]
 
 
-gameSlots : Int -> List GameSlot -> Html Msg
-gameSlots cardHeight slots =
+gameSlots : Int -> Maybe Card -> List GameSlot -> Html Msg
+gameSlots cardHeight selected slots =
     Element.layout [] <|
         row [ spacing 10 ] <|
-            List.map (gameSlot cardHeight) slots
+            List.map (gameSlot cardHeight selected) slots
 
 
-gameSlot : Int -> GameSlot -> Element Msg
-gameSlot cardHeight slot =
+gameSlot : Int -> Maybe Card -> GameSlot -> Element Msg
+gameSlot cardHeight selected slot =
     case slot.card of
         Just card ->
             cardOutline cardHeight [] (cardContents cardHeight card)
 
         Nothing ->
-            cardOutline cardHeight
-                [ Border.dashed ]
-                [ el [ centerX, centerY ] (Element.text <| Game.slotName slot)
-                ]
+            case selected of
+                Just (Character _ _ traits) ->
+                    if List.member slot.requirements traits then
+                        selectableSlot cardHeight slot
+
+                    else
+                        emptySlot cardHeight slot
+
+                _ ->
+                    emptySlot cardHeight slot
+
+
+selectableSlot : Int -> GameSlot -> Element a
+selectableSlot cardHeight slot =
+    cardOutline cardHeight
+        [ Border.dashed, Border.color (Element.rgb 0 1 0) ]
+        [ el [ centerX, centerY ] (Element.text <| Game.slotName slot)
+        ]
+
+
+emptySlot : Int -> GameSlot -> Element a
+emptySlot cardHeight slot =
+    cardOutline cardHeight
+        [ Border.dashed ]
+        [ el [ centerX, centerY ] (Element.text <| Game.slotName slot)
+        ]
 
 
 viewScore : Int -> Html a

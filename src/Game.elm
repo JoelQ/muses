@@ -56,42 +56,12 @@ map function =
 
 
 type alias GameSlot =
-    { requirements : SlotRequirement, card : Maybe Card }
-
-
-type SlotRequirement
-    = Female
-    | GreatPoet
-    | Seafarer
-    | Underworld
-    | Ruler
-    | Beast
-    | Small
+    { requirements : Card.Trait, card : Maybe Card }
 
 
 slotName : GameSlot -> String
 slotName { requirements } =
-    case requirements of
-        Female ->
-            "Female"
-
-        GreatPoet ->
-            "Great Poet"
-
-        Seafarer ->
-            "Seafarer"
-
-        Underworld ->
-            "Underworld"
-
-        Ruler ->
-            "Ruler"
-
-        Beast ->
-            "Beast"
-
-        Small ->
-            "Small"
+    Card.traitName requirements
 
 
 type alias GameState =
@@ -110,7 +80,7 @@ playCard ( cardId, card ) state =
                     |> executeCardEffects ( cardId, card )
                     |> removeFromHand cardId
 
-            Card.Character _ _ ->
+            Card.Character _ _ _ ->
                 modifyCurrentPlayer (Player.selectCard cardId) state
 
     else
@@ -123,7 +93,7 @@ executeCardEffects ( id, card ) state =
         Card.OneShot _ (Card.GeneratePoints (MuseumPoints n)) ->
             modifyCurrentPlayer (Player.increaseScore n) state
 
-        Card.Character _ _ ->
+        Card.Character _ _ _ ->
             modifyCurrentPlayer (Player.playCharacter id card) state
 
 
@@ -132,7 +102,7 @@ shuffleAndStart myDeck =
     Random.map3 GameState
         (Player.randomPlayer "Player 1" myDeck)
         (Player.randomOpponent "Player 2" myDeck)
-        (Random.constant [ GameSlot Female Nothing, GameSlot Small Nothing ])
+        (Random.constant [ GameSlot Card.Female Nothing, GameSlot Card.Small Nothing ])
 
 
 removeFromHand : Int -> GameState -> GameState
