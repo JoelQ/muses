@@ -75,7 +75,7 @@ update msg model =
             ( model, Random.generate StartPlaying (Game.shuffleAndStart deck) )
 
         StartPlaying state ->
-            ( Game.Playing state, Cmd.none )
+            ( Game.Complete state.currentPlayer, Cmd.none )
 
         EndTurn ->
             model
@@ -120,11 +120,16 @@ viewGame game =
             viewPlaying state
 
         Game.Complete winner ->
-            text <|
-                "The winner is "
-                    ++ winner.name
-                    ++ " - "
-                    ++ Card.deckName winner.deck
+            winScreen winner
+
+
+winScreen : Player -> Html a
+winScreen winner =
+    Element.layout [] <|
+        column [ centerX, spacing 20 ]
+            [ Element.text "The winner is:"
+            , portrait [] musePortraitHeight winner.deck
+            ]
 
 
 musePortraitHeight : Int
@@ -149,11 +154,14 @@ choices =
 
 choice : Int -> Card.Deck -> Element Msg
 choice cardHeight deck =
+    portrait [ Events.onClick <| SelectDeck deck ] cardHeight deck
+
+
+portrait : List (Element.Attribute a) -> Int -> Card.Deck -> Element a
+portrait attributes cardHeight deck =
     column [ spacing 10 ]
         [ cardOutline cardHeight
-            [ Background.image <| Card.deckPortrait deck
-            , Events.onClick <| SelectDeck deck
-            ]
+            ((Background.image <| Card.deckPortrait deck) :: attributes)
             []
         , el [ centerX ] <| Element.text <| Card.deckName deck
         ]
