@@ -21,6 +21,7 @@ import Element
         , spacing
         , width
         )
+import Element.Background as Background
 import Element.Border as Border
 import Element.Events as Events
 import Element.Font as Font
@@ -233,7 +234,10 @@ cardImage cardHeight card =
 
 cardBack : Int -> Element a
 cardBack cardHeight =
-    cardOutline cardHeight [] []
+    cardOutline cardHeight
+        [ Background.image "../images/muses-meta/card-back.jpg"
+        ]
+        []
 
 
 cardOutline :
