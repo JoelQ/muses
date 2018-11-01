@@ -24,7 +24,8 @@ import Element
 import Element.Border as Border
 import Element.Events as Events
 import Element.Font as Font
-import Game exposing (Game, GameSlot, GameState)
+import Game exposing (Game, GameState)
+import GameSlot exposing (GameSlot(..))
 import Html exposing (..)
 import Html.Attributes exposing (max, value)
 import Html.Events exposing (onClick)
@@ -156,14 +157,14 @@ gameSlots cardHeight selected slots =
 
 gameSlot : Int -> Maybe Card.WithId -> GameSlot -> Element Msg
 gameSlot cardHeight selected slot =
-    case slot.card of
-        Just { card } ->
+    case slot of
+        Filled _ _ card ->
             cardOutline cardHeight [] (cardContents cardHeight card)
 
-        Nothing ->
+        Open requirements ->
             case selected of
                 Just ( id, (Character _ _ traits) as card ) ->
-                    if List.member slot.requirements traits then
+                    if List.member requirements traits then
                         selectableSlot cardHeight id card slot
 
                     else
@@ -180,7 +181,7 @@ selectableSlot cardHeight id card slot =
         , Border.color (Element.rgb 0 1 0)
         , Events.onClick (PlayCardToSlot id card slot)
         ]
-        [ el [ centerX, centerY ] (Element.text <| Game.slotName slot)
+        [ el [ centerX, centerY ] (Element.text <| GameSlot.name slot)
         ]
 
 
@@ -188,7 +189,7 @@ emptySlot : Int -> GameSlot -> Element a
 emptySlot cardHeight slot =
     cardOutline cardHeight
         [ Border.dashed ]
-        [ el [ centerX, centerY ] (Element.text <| Game.slotName slot)
+        [ el [ centerX, centerY ] (Element.text <| GameSlot.name slot)
         ]
 
 

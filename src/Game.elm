@@ -1,6 +1,5 @@
 module Game exposing
     ( Game(..)
-    , GameSlot
     , GameState
     , andThen
     , checkWin
@@ -13,11 +12,11 @@ module Game exposing
     , resetCurrentPlayer
     , selectCard
     , shuffleAndStart
-    , slotName
     , swapPlayers
     )
 
 import Card exposing (Card)
+import GameSlot exposing (GameSlot(..))
 import MuseumPoints exposing (MuseumPoints(..))
 import Player exposing (Player)
 import Random
@@ -57,17 +56,6 @@ map function =
 -- GAME STATE
 
 
-type alias GameSlot =
-    { requirements : Card.Trait
-    , card : Maybe { owner : String, card : Card }
-    }
-
-
-slotName : GameSlot -> String
-slotName { requirements } =
-    Card.traitName requirements
-
-
 type alias GameState =
     { currentPlayer : Player
     , otherPlayer : Player
@@ -101,14 +89,14 @@ selectCard cardId state =
 
 
 addCardToSlot : String -> Card -> GameSlot -> List GameSlot -> List GameSlot
-addCardToSlot owner card slot =
+addCardToSlot owner card targetSlot =
     List.map
-        (\s ->
-            if s.requirements == slot.requirements then
-                { s | card = Just { owner = owner, card = card } }
+        (\currentSlot ->
+            if targetSlot == currentSlot then
+                GameSlot.fillWith owner card currentSlot
 
             else
-                s
+                currentSlot
         )
 
 
@@ -133,7 +121,7 @@ shuffleAndStart myDeck =
     Random.map3 GameState
         (Player.randomPlayer "Player 1" myDeck)
         (Player.randomOpponent "Player 2" myDeck)
-        (Random.constant [ GameSlot Card.Female Nothing, GameSlot Card.Small Nothing ])
+        (Random.constant [ Open Card.Female, Open Card.Small ])
 
 
 removeFromHand : Int -> GameState -> GameState
@@ -144,26 +132,10 @@ removeFromHand cardId state =
 playCurrentCharacters : GameState -> GameState
 playCurrentCharacters ({ currentPlayer, slots } as state) =
     modifyCurrentPlayer
-        (Player.addPointsFromCharacters <| cardsInPlayFor currentPlayer slots)
+        (Player.addPointsFromCharacters <|
+            GameSlot.cardsOwnedBy currentPlayer.name slots
+        )
         state
-
-
-cardsInPlayFor : Player -> List GameSlot -> List Card
-cardsInPlayFor player slots =
-    slots
-        |> List.filterMap
-            (\slot ->
-                case slot.card of
-                    Just { owner, card } ->
-                        if owner == player.name then
-                            Just card
-
-                        else
-                            Nothing
-
-                    Nothing ->
-                        Nothing
-            )
 
 
 swapPlayers : GameState -> GameState
