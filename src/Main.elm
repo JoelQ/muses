@@ -114,7 +114,7 @@ viewGame : Game -> Html Msg
 viewGame game =
     case game of
         Game.Choosing ->
-            choices
+            choiceScreen
 
         Game.Playing state ->
             viewPlaying state
@@ -127,14 +127,36 @@ viewGame game =
                     ++ Card.deckName winner.deck
 
 
-choices : Html Msg
+musePortraitHeight : Int
+musePortraitHeight =
+    300
+
+
+choiceScreen : Html Msg
+choiceScreen =
+    Element.layout [] <|
+        column [ centerX, spacing 20 ]
+            [ Element.text "Choose a deck"
+            , choices
+            ]
+
+
+choices : Element Msg
 choices =
-    ul [] <| List.map choice Card.deckChoices
+    row [ spacing 10 ] <|
+        List.map (choice musePortraitHeight) Card.deckChoices
 
 
-choice : Card.Deck -> Html Msg
-choice deck =
-    li [ onClick <| SelectDeck deck ] [ text <| Card.deckName deck ]
+choice : Int -> Card.Deck -> Element Msg
+choice cardHeight deck =
+    column [ spacing 10 ]
+        [ cardOutline cardHeight
+            [ Background.image <| Card.deckPortrait deck
+            , Events.onClick <| SelectDeck deck
+            ]
+            []
+        , el [ centerX ] <| Element.text <| Card.deckName deck
+        ]
 
 
 viewPlaying : GameState -> Html Msg

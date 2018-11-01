@@ -7,6 +7,7 @@ module Card exposing
     , cardsForDeck
     , deckChoices
     , deckName
+    , deckPortrait
     , flavorText
     , imagePath
     , magnitude
@@ -178,6 +179,22 @@ deckName deck =
 
         DivinePoetry ->
             "Polyhymnia (Divine Poetry)"
+
+
+deckPortrait : Deck -> String
+deckPortrait deck =
+    case deck of
+        Tragedy ->
+            "../images/muses-meta/melpomene.jpg"
+
+        Comedy ->
+            "../images/muses-meta/thalia.jpg"
+
+        EpicPoetry ->
+            "../images/muses-meta/calliope.jpg"
+
+        DivinePoetry ->
+            "../images/muses-meta/polyhymnia.jpg"
 
 
 cardsForDeck : Deck -> List Card
