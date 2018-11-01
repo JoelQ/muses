@@ -164,11 +164,20 @@ viewPlaying { currentPlayer, otherPlayer, slots } =
     div []
         [ otherPlayerView otherPlayer
         , hr [] []
-        , gameSlots 210 (Player.selectedCard currentPlayer) slots
+        , centerSection currentPlayer slots
         , hr [] []
         , currentPlayerView currentPlayer
-        , button [ onClick EndTurn ] [ text "End Turn" ]
         ]
+
+
+centerSection : Player -> List GameSlot -> Html Msg
+centerSection player slots =
+    Element.layout [] <|
+        row [ width Element.fill ]
+            [ el [ alignLeft, centerY, padding 10 ] <|
+                Element.html (button [ onClick EndTurn ] [ text "End Turn" ])
+            , el [ centerX ] <| gameSlots 200 (Player.selectedCard player) slots
+            ]
 
 
 otherPlayerView : Player -> Html Msg
@@ -200,12 +209,12 @@ playerHighlights player =
 
 playerHandBacks : Player -> Element Msg
 playerHandBacks player =
-    cardListBack 210 <| Dict.toList player.hand
+    cardListBack 200 <| Dict.toList player.hand
 
 
 playerHand : Player -> Element Msg
 playerHand player =
-    cardList 210 player.selected <| Dict.toList player.hand
+    cardList 200 player.selected <| Dict.toList player.hand
 
 
 deckLogo : Deck -> Element a
@@ -220,11 +229,10 @@ deckLogo deck =
         Element.none
 
 
-gameSlots : Int -> Maybe Card.WithId -> List GameSlot -> Html Msg
+gameSlots : Int -> Maybe Card.WithId -> List GameSlot -> Element Msg
 gameSlots cardHeight selected slots =
-    Element.layout [] <|
-        row [ spacing 10, centerX ] <|
-            List.map (gameSlot cardHeight selected) slots
+    row [ spacing 10, centerX ] <|
+        List.map (gameSlot cardHeight selected) slots
 
 
 gameSlot : Int -> Maybe Card.WithId -> GameSlot -> Element Msg
