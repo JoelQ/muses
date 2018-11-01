@@ -263,7 +263,7 @@ cardContents cardHeight card =
         ]
     , el [ centerX, padding 5 ] (cardImage cardHeight card)
     , paragraph [ centerX, Font.italic, Font.size 14 ]
-        [ Element.text "Some colorful flavor text that keeps going and going and going" ]
+        [ Element.text <| Card.flavorText card ]
     ]
 
 
