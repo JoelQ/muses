@@ -25,13 +25,16 @@ import Random
 type Game
     = Choosing
     | Playing GameState
-    | Complete
+    | Complete Player
 
 
 checkWin : GameState -> Game
 checkWin ({ currentPlayer, otherPlayer } as state) =
-    if currentPlayer.score >= 100 || otherPlayer.score >= 100 then
-        Complete
+    if currentPlayer.score >= 100 then
+        Complete currentPlayer
+
+    else if otherPlayer.score >= 100 then
+        Complete otherPlayer
 
     else
         Playing state

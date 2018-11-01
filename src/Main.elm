@@ -118,8 +118,12 @@ viewGame game =
         Game.Playing state ->
             viewPlaying state
 
-        Game.Complete ->
-            text "Someone won!"
+        Game.Complete winner ->
+            text <|
+                "The winner is "
+                    ++ winner.name
+                    ++ " - "
+                    ++ Card.deckName winner.deck
 
 
 choices : Html Msg
