@@ -3,13 +3,13 @@ module Player exposing
     , addPointsFromCharacters
     , buildInitial
     , drawCard
+    , endOfTurnReset
     , increaseScore
     , playCharacter
     , playOneShot
     , randomOpponent
     , randomPlayer
     , removeFromHand
-    , resetPlayedCardCount
     , selectCard
     , selectedCard
     )
@@ -110,9 +110,9 @@ selectCard id player =
     { player | selected = Just id }
 
 
-resetPlayedCardCount : Player -> Player
-resetPlayedCardCount player =
-    { player | cardsPlayed = 0 }
+endOfTurnReset : Player -> Player
+endOfTurnReset player =
+    { player | cardsPlayed = 0, selected = Nothing }
 
 
 drawCard : Player -> Player

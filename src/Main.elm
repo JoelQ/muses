@@ -80,7 +80,7 @@ update msg model =
                 |> Game.map Game.playCurrentCharacters
                 |> Game.andThen Game.checkWin
                 |> Game.map Game.drawCard
-                |> Game.map Game.resetPlayedCardCount
+                |> Game.map Game.resetCurrentPlayer
                 |> Game.map Game.swapPlayers
                 |> withNoCmd
 

@@ -10,7 +10,7 @@ module Game exposing
     , playCardToSlot
     , playCurrentCharacters
     , removeFromHand
-    , resetPlayedCardCount
+    , resetCurrentPlayer
     , selectCard
     , shuffleAndStart
     , slotName
@@ -157,9 +157,9 @@ drawCard =
     modifyCurrentPlayer Player.drawCard
 
 
-resetPlayedCardCount : GameState -> GameState
-resetPlayedCardCount =
-    modifyCurrentPlayer Player.resetPlayedCardCount
+resetCurrentPlayer : GameState -> GameState
+resetCurrentPlayer =
+    modifyCurrentPlayer Player.endOfTurnReset
 
 
 modifyCurrentPlayer : (Player -> Player) -> GameState -> GameState
