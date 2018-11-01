@@ -5,6 +5,7 @@ module Player exposing
     , drawCard
     , increaseScore
     , playCharacter
+    , playOneShot
     , randomOpponent
     , randomPlayer
     , removeFromHand
@@ -80,6 +81,14 @@ addPointsFromCharacters player =
 increaseScore : Int -> Player -> Player
 increaseScore n player =
     { player | score = player.score + n }
+
+
+playOneShot : Int -> Player -> Player
+playOneShot n player =
+    { player
+        | score = player.score + n
+        , cardsPlayed = player.cardsPlayed + 1
+    }
 
 
 playCharacter : Int -> Player -> Player

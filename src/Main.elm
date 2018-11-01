@@ -41,6 +41,7 @@ type Msg
     = SelectDeck Card.Deck
     | StartPlaying GameState
     | PlayCard Int Card
+    | SelectCard Int
     | PlayCardToSlot Int Card GameSlot
     | EndTurn
 
@@ -87,6 +88,11 @@ update msg model =
             model
                 |> Game.map (Game.playCard ( cardId, card ))
                 |> Game.andThen Game.checkWin
+                |> withNoCmd
+
+        SelectCard cardId ->
+            model
+                |> Game.map (Game.selectCard cardId)
                 |> withNoCmd
 
         PlayCardToSlot cardId card slot ->
@@ -259,10 +265,20 @@ cardContents cardHeight card =
     ]
 
 
+clickEvent : Card.WithId -> Element.Attribute Msg
+clickEvent ( id, card ) =
+    case card of
+        OneShot _ _ ->
+            Events.onClick (PlayCard id card)
+
+        Character _ _ _ ->
+            Events.onClick (SelectCard id)
+
+
 cardElement : Int -> Maybe Int -> Card.WithId -> Element Msg
 cardElement cardHeight selected ( id, card ) =
     cardOutline cardHeight
-        [ Events.onClick (PlayCard id card), borderColor selected id ]
+        [ clickEvent ( id, card ), borderColor selected id ]
         (cardContents cardHeight card)
 
 

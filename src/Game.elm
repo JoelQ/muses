@@ -11,6 +11,7 @@ module Game exposing
     , playCurrentCharacters
     , removeFromHand
     , resetPlayedCardCount
+    , selectCard
     , shuffleAndStart
     , slotName
     , swapPlayers
@@ -82,7 +83,16 @@ playCard ( cardId, card ) state =
                     |> removeFromHand cardId
 
             Card.Character _ _ _ ->
-                modifyCurrentPlayer (Player.selectCard cardId) state
+                state
+
+    else
+        state
+
+
+selectCard : Int -> GameState -> GameState
+selectCard cardId state =
+    if state.currentPlayer.cardsPlayed == 0 then
+        modifyCurrentPlayer (Player.selectCard cardId) state
 
     else
         state
@@ -110,7 +120,7 @@ executeCardEffects : Card.WithId -> GameState -> GameState
 executeCardEffects ( id, card ) state =
     case card of
         Card.OneShot _ (Card.GeneratePoints (MuseumPoints n)) ->
-            modifyCurrentPlayer (Player.increaseScore n) state
+            modifyCurrentPlayer (Player.playOneShot n) state
 
         Card.Character _ _ _ ->
             state
