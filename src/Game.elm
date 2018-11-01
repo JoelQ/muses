@@ -58,7 +58,9 @@ map function =
 
 
 type alias GameSlot =
-    { requirements : Card.Trait, card : Maybe Card }
+    { requirements : Card.Trait
+    , card : Maybe { owner : String, card : Card }
+    }
 
 
 slotName : GameSlot -> String
@@ -98,12 +100,12 @@ selectCard cardId state =
         state
 
 
-addCardToSlot : Card -> GameSlot -> List GameSlot -> List GameSlot
-addCardToSlot card slot =
+addCardToSlot : String -> Card -> GameSlot -> List GameSlot -> List GameSlot
+addCardToSlot owner card slot =
     List.map
         (\s ->
             if s.requirements == slot.requirements then
-                { s | card = Just card }
+                { s | card = Just { owner = owner, card = card } }
 
             else
                 s
@@ -112,7 +114,7 @@ addCardToSlot card slot =
 
 playCardToSlot : Card.WithId -> GameSlot -> GameState -> GameState
 playCardToSlot ( cardId, card ) slot state =
-    { state | slots = addCardToSlot card slot state.slots }
+    { state | slots = addCardToSlot state.currentPlayer.name card slot state.slots }
         |> modifyCurrentPlayer (Player.playCharacter cardId)
 
 
@@ -140,8 +142,28 @@ removeFromHand cardId state =
 
 
 playCurrentCharacters : GameState -> GameState
-playCurrentCharacters =
-    modifyCurrentPlayer Player.addPointsFromCharacters
+playCurrentCharacters ({ currentPlayer, slots } as state) =
+    modifyCurrentPlayer
+        (Player.addPointsFromCharacters <| cardsInPlayFor currentPlayer slots)
+        state
+
+
+cardsInPlayFor : Player -> List GameSlot -> List Card
+cardsInPlayFor player slots =
+    slots
+        |> List.filterMap
+            (\slot ->
+                case slot.card of
+                    Just { owner, card } ->
+                        if owner == player.name then
+                            Just card
+
+                        else
+                            Nothing
+
+                    Nothing ->
+                        Nothing
+            )
 
 
 swapPlayers : GameState -> GameState

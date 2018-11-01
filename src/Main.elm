@@ -157,7 +157,7 @@ gameSlots cardHeight selected slots =
 gameSlot : Int -> Maybe Card.WithId -> GameSlot -> Element Msg
 gameSlot cardHeight selected slot =
     case slot.card of
-        Just card ->
+        Just { card } ->
             cardOutline cardHeight [] (cardContents cardHeight card)
 
         Nothing ->

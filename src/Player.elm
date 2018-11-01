@@ -26,7 +26,6 @@ type alias Player =
     , cardPile : List Card.WithId
     , hand : Dict Int Card
     , score : Int
-    , characters : Dict Int Card
     , cardsPlayed : Int
     , selected : Maybe Int
     }
@@ -48,7 +47,6 @@ buildInitial name deck cards =
     , cardPile = List.drop cardsDealt cards
     , hand = Dict.fromList (List.take cardsDealt cards)
     , score = 0
-    , characters = Dict.empty
     , cardsPlayed = 0
     , selected = Nothing
     }
@@ -65,17 +63,17 @@ randomOpponent name otherDeck =
         |> Random.andThen (\deck -> randomPlayer name deck)
 
 
-scoreFromCharacters : Player -> Int
-scoreFromCharacters { characters } =
-    Dict.values characters
+scoreFromCharacters : List Card -> Int
+scoreFromCharacters cards =
+    cards
         |> List.map Card.magnitude
         |> List.map MuseumPoints.toInt
         |> List.sum
 
 
-addPointsFromCharacters : Player -> Player
-addPointsFromCharacters player =
-    increaseScore (scoreFromCharacters player) player
+addPointsFromCharacters : List Card -> Player -> Player
+addPointsFromCharacters cards player =
+    increaseScore (scoreFromCharacters cards) player
 
 
 increaseScore : Int -> Player -> Player
