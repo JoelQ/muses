@@ -2,10 +2,14 @@ module GameSlot exposing
     ( GameSlot(..)
     , cardsOwnedBy
     , fillWith
+    , initial
     , name
     )
 
+import Array exposing (Array)
 import Card exposing (Card)
+import Random
+import Random.Array
 
 
 type GameSlot
@@ -55,3 +59,28 @@ requirements slot =
 
         Filled reqs _ _ ->
             reqs
+
+
+all : List GameSlot
+all =
+    [ Open Card.Female
+    , Open Card.GreatPoet
+    , Open Card.Seafarer
+    , Open Card.Underworld
+    , Open Card.Ruler
+    , Open Card.Beast
+    , Open Card.Small
+    ]
+
+
+initialSlotCount : Int
+initialSlotCount =
+    5
+
+
+initial : Random.Generator (List GameSlot)
+initial =
+    all
+        |> Array.fromList
+        |> Random.Array.shuffle
+        |> Random.map (List.take initialSlotCount << Array.toList)

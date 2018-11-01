@@ -121,7 +121,7 @@ shuffleAndStart myDeck =
     Random.map3 GameState
         (Player.randomPlayer "Player 1" myDeck)
         (Player.randomOpponent "Player 2" myDeck)
-        (Random.constant [ Open Card.Female, Open Card.Small ])
+        GameSlot.initial
 
 
 removeFromHand : Int -> GameState -> GameState
