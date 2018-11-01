@@ -162,23 +162,55 @@ choice cardHeight deck =
 viewPlaying : GameState -> Html Msg
 viewPlaying { currentPlayer, otherPlayer, slots } =
     div []
-        [ h3 [] [ text <| otherPlayer.name ++ " " ++ Card.deckName otherPlayer.deck ]
-        , div [] [ viewScore otherPlayer.score ]
-        , cardListBack 210 <| Dict.toList otherPlayer.hand
+        [ otherPlayerView otherPlayer
         , hr [] []
         , gameSlots 210 (Player.selectedCard currentPlayer) slots
         , hr [] []
-        , cardList 210 currentPlayer.selected <| Dict.toList currentPlayer.hand
-        , div [] [ viewScore currentPlayer.score ]
-        , h3 [] [ text <| "Me - " ++ Card.deckName currentPlayer.deck ]
+        , currentPlayerView currentPlayer
         , button [ onClick EndTurn ] [ text "End Turn" ]
         ]
+
+
+otherPlayerView : Player -> Html Msg
+otherPlayerView otherPlayer =
+    Element.layout [] <|
+        row [ width Element.fill ]
+            [ el [ alignLeft ] <| playerHighlights otherPlayer
+            , el [ centerX ] <| playerHandBacks otherPlayer
+            ]
+
+
+currentPlayerView : Player -> Html Msg
+currentPlayerView currentPlayer =
+    Element.layout [] <|
+        row [ width Element.fill ]
+            [ el [ alignLeft ] <| playerHighlights currentPlayer
+            , el [ centerX ] <| playerHand currentPlayer
+            ]
+
+
+playerHighlights : Player -> Element a
+playerHighlights player =
+    column [ padding 10, spacing 100 ]
+        [ Element.text <| Card.deckName player.deck
+        , Element.html <| viewScore player.score
+        ]
+
+
+playerHandBacks : Player -> Element Msg
+playerHandBacks player =
+    cardListBack 210 <| Dict.toList player.hand
+
+
+playerHand : Player -> Element Msg
+playerHand player =
+    cardList 210 player.selected <| Dict.toList player.hand
 
 
 gameSlots : Int -> Maybe Card.WithId -> List GameSlot -> Html Msg
 gameSlots cardHeight selected slots =
     Element.layout [] <|
-        row [ spacing 10 ] <|
+        row [ spacing 10, centerX ] <|
             List.map (gameSlot cardHeight selected) slots
 
 
@@ -224,6 +256,7 @@ viewScore : Int -> Html a
 viewScore score =
     div []
         [ text (String.fromInt score)
+        , text " "
         , Html.progress [ max "100", value (String.fromInt score) ]
             [ text (String.fromInt score) ]
         ]
@@ -319,14 +352,13 @@ borderColor selected currentId =
         Border.color (Element.rgb 0 0 0)
 
 
-cardListBack : Int -> List a -> Html msg
+cardListBack : Int -> List a -> Element msg
 cardListBack cardHeight cards =
-    Element.layout [] (row [ spacing 10 ] <| List.map (always <| cardBack cardHeight) cards)
+    row [ spacing 10, centerX ] <|
+        List.map (always <| cardBack cardHeight) cards
 
 
-cardList : Int -> Maybe Int -> List Card.WithId -> Html Msg
+cardList : Int -> Maybe Int -> List Card.WithId -> Element Msg
 cardList cardHeight selected cards =
-    Element.layout []
-        (row [ spacing 10 ] <|
-            List.map (cardElement cardHeight selected) cards
-        )
+    row [ spacing 10, centerX ] <|
+        List.map (cardElement cardHeight selected) cards
