@@ -234,11 +234,17 @@ tragedyDeck : List Card
 tragedyDeck =
     [ sophocles
     , erinyes
+    , hubris
+    , hubris
     , agamemnon
     , antigone
     , siren
     , siren
     , siren
+    , trilogy
+    , trilogy
+    , katharsis
+    , katharsis
     ]
 
 
@@ -250,16 +256,23 @@ comedyDeck =
     , satyrPlay
     , satyrPlay
     , satyrPlay
+    , appleOfDiscord
+    , fates
+    , laughter
+    , laughter
+    , newComedy
     ]
 
 
 epicPoetryDeck : List Card
 epicPoetryDeck =
     [ atalanta
-    , jason
     , theseus
     , homer
     , arctinus
+    , heros
+    , heros
+    , heros
     ]
 
 
@@ -273,11 +286,26 @@ divinePoetryDeck =
     , hymn
     , hymn
     , hymn
+    , lightning
+    , lightning
+    , sacrifice
+    , sacrifice
     ]
 
 
 
 -- INDIVIDUAL CARDS
+
+
+fates : Card
+fates =
+    Character
+        { name = "Fates"
+        , image = "fates.jpg"
+        , flavorText = "Past, present, and future"
+        }
+        (MuseumPoints 2)
+        [ Female ]
 
 
 sophocles : Card
@@ -357,6 +385,86 @@ amphitheater =
         []
 
 
+trilogy : Card
+trilogy =
+    OneShot
+        { name = "Trilogy"
+        , image = "trilogy.jpg"
+        , flavorText = "Improves our sales numbers"
+        }
+        (GeneratePoints <| MuseumPoints 6)
+
+
+sacrifice : Card
+sacrifice =
+    OneShot
+        { name = "Sacrifice"
+        , image = "sacrifice.jpg"
+        , flavorText = "A gift to the gods"
+        }
+        (GeneratePoints <| MuseumPoints 6)
+
+
+katharsis : Card
+katharsis =
+    OneShot
+        { name = "Katharsis"
+        , image = "katharsis.jpg"
+        , flavorText = "κάθαρσις - a purification"
+        }
+        (GeneratePoints <| MuseumPoints 8)
+
+
+newComedy : Card
+newComedy =
+    OneShot
+        { name = "New Comedy"
+        , image = "new-comedy.jpg"
+        , flavorText = "Finding humor in every day life"
+        }
+        (GeneratePoints <| MuseumPoints 12)
+
+
+lightning : Card
+lightning =
+    OneShot
+        { name = "Lightning"
+        , image = "lightning.jpg"
+        , flavorText = "Zeus wields these mighty bolts"
+        }
+        (GeneratePoints <| MuseumPoints 6)
+
+
+laughter : Card
+laughter =
+    OneShot
+        { name = "Laughter"
+        , image = "laughter.jpg"
+        , flavorText = "Every comic author's dream"
+        }
+        (GeneratePoints <| MuseumPoints 8)
+
+
+hubris : Card
+hubris =
+    OneShot
+        { name = "Hubris"
+        , image = "hubris.jpg"
+        , flavorText = "ὕβρις - even the gods can't match this!"
+        }
+        (GeneratePoints <| MuseumPoints 8)
+
+
+heros : Card
+heros =
+    OneShot
+        { name = "Heros"
+        , image = "heros.jpg"
+        , flavorText = "ἥρως - veneration of a person's great deeds"
+        }
+        (GeneratePoints <| MuseumPoints 6)
+
+
 satyrPlay : Card
 satyrPlay =
     OneShot
@@ -365,6 +473,17 @@ satyrPlay =
         , flavorText = "Need something funny after watching a tragedy"
         }
         (GeneratePoints <| MuseumPoints 10)
+
+
+perseus : Card
+perseus =
+    Character
+        { name = "Perseus"
+        , image = "perseus.jpg"
+        , flavorText = "Don't look!"
+        }
+        (MuseumPoints 2)
+        []
 
 
 atalanta : Card
@@ -442,6 +561,26 @@ prometheus =
         }
         (MuseumPoints 2)
         []
+
+
+blessedVintage : Card
+blessedVintage =
+    OneShot
+        { name = "Blessed Vintage"
+        , image = "blessed-vintage.jpg"
+        , flavorText = "The harvest is amazing this year!"
+        }
+        (GeneratePoints <| MuseumPoints 10)
+
+
+appleOfDiscord : Card
+appleOfDiscord =
+    OneShot
+        { name = "Apple of Discord"
+        , image = "apple-discord.jpg"
+        , flavorText = "Who is the fairest one of all?"
+        }
+        (GeneratePoints <| MuseumPoints 7)
 
 
 artemis : Card
