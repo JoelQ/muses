@@ -169,45 +169,144 @@ cardsForDeck deck =
 
 tragedyDeck : List Card
 tragedyDeck =
-    [ Character "Sophocles" (MuseumPoints 1) [ GreatPoet ]
-    , Character "Erinyes" (MuseumPoints 2) []
-    , Character "Agammemnon" (MuseumPoints 3) [ Ruler ]
-    , Character "Antigone" (MuseumPoints 2) [ Female ]
-    , Character "Siren" (MuseumPoints 1) [ Female ]
-    , Character "Siren" (MuseumPoints 1) [ Female ]
-    , Character "Siren" (MuseumPoints 1) [ Female ]
+    [ sophocles
+    , erinyes
+    , agammemnon
+    , antigone
+    , siren
+    , siren
+    , siren
     ]
 
 
 comedyDeck : List Card
 comedyDeck =
-    [ Character "Aristophanes" (MuseumPoints 1) [ GreatPoet ]
-    , Character "Amphitheater" (MuseumPoints 1) []
-    , Character "Amphitheater" (MuseumPoints 1) []
-    , OneShot "Satyr Play" (GeneratePoints <| MuseumPoints 10)
-    , OneShot "Satyr Play" (GeneratePoints <| MuseumPoints 10)
-    , OneShot "Satyr Play" (GeneratePoints <| MuseumPoints 10)
+    [ aristophanes
+    , amphitheater
+    , amphitheater
+    , satyrPlay
+    , satyrPlay
+    , satyrPlay
     ]
 
 
 epicPoetryDeck : List Card
 epicPoetryDeck =
-    [ Character "Atalanta" (MuseumPoints 2) [ Female, Seafarer ]
-    , Character "Jason" (MuseumPoints 3) [ Seafarer ]
-    , Character "Theseus" (MuseumPoints 2) [ Seafarer, Underworld ]
-    , Character "Homer" (MuseumPoints 1) [ GreatPoet ]
-    , Character "Arctinus" (MuseumPoints 1) [ GreatPoet ]
+    [ atalanta
+    , jason
+    , theseus
+    , homer
+    , arctinus
     ]
 
 
 divinePoetryDeck : List Card
 divinePoetryDeck =
-    [ Character "Hesiod" (MuseumPoints 1) [ GreatPoet ]
-    , Character "Prometheus" (MuseumPoints 2) []
-    , Character "Artemis" (MuseumPoints 3) [ Female ]
-    , Character "Poseidon" (MuseumPoints 4) [ Seafarer ]
-    , Character "Apollo" (MuseumPoints 5) []
-    , OneShot "Hymn" (GeneratePoints <| MuseumPoints 10)
-    , OneShot "Hymn" (GeneratePoints <| MuseumPoints 10)
-    , OneShot "Hymn" (GeneratePoints <| MuseumPoints 10)
+    [ hesiod
+    , prometheus
+    , artemis
+    , poseidon
+    , apollo
+    , hymn
+    , hymn
+    , hymn
     ]
+
+
+
+-- INDIVIDUAL CARDS
+
+
+sophocles : Card
+sophocles =
+    Character "Sophocles" (MuseumPoints 1) [ GreatPoet ]
+
+
+erinyes : Card
+erinyes =
+    Character "Erinyes" (MuseumPoints 2) []
+
+
+agammemnon : Card
+agammemnon =
+    Character "Agammemnon" (MuseumPoints 3) [ Ruler ]
+
+
+antigone : Card
+antigone =
+    Character "Antigone" (MuseumPoints 2) [ Female ]
+
+
+siren : Card
+siren =
+    Character "Siren" (MuseumPoints 1) [ Female ]
+
+
+aristophanes : Card
+aristophanes =
+    Character "Aristophanes" (MuseumPoints 1) [ GreatPoet ]
+
+
+amphitheater : Card
+amphitheater =
+    Character "Amphitheater" (MuseumPoints 1) []
+
+
+satyrPlay : Card
+satyrPlay =
+    OneShot "Satyr Play" (GeneratePoints <| MuseumPoints 10)
+
+
+atalanta : Card
+atalanta =
+    Character "Atalanta" (MuseumPoints 2) [ Female, Seafarer ]
+
+
+jason : Card
+jason =
+    Character "Jason" (MuseumPoints 3) [ Seafarer ]
+
+
+theseus : Card
+theseus =
+    Character "Theseus" (MuseumPoints 2) [ Seafarer, Underworld ]
+
+
+homer : Card
+homer =
+    Character "Homer" (MuseumPoints 1) [ GreatPoet ]
+
+
+arctinus : Card
+arctinus =
+    Character "Arctinus" (MuseumPoints 1) [ GreatPoet ]
+
+
+hesiod : Card
+hesiod =
+    Character "Hesiod" (MuseumPoints 1) [ GreatPoet ]
+
+
+prometheus : Card
+prometheus =
+    Character "Prometheus" (MuseumPoints 2) []
+
+
+artemis : Card
+artemis =
+    Character "Artemis" (MuseumPoints 3) [ Female ]
+
+
+poseidon : Card
+poseidon =
+    Character "Poseidon" (MuseumPoints 4) [ Seafarer ]
+
+
+apollo : Card
+apollo =
+    Character "Apollo" (MuseumPoints 5) []
+
+
+hymn : Card
+hymn =
+    OneShot "Hymn" (GeneratePoints <| MuseumPoints 10)
