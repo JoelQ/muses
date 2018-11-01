@@ -1,7 +1,7 @@
 module Main exposing (main)
 
 import Browser
-import Card exposing (Card(..))
+import Card exposing (Card(..), Deck)
 import Dict
 import Element
     exposing
@@ -175,7 +175,7 @@ otherPlayerView : Player -> Html Msg
 otherPlayerView otherPlayer =
     Element.layout [] <|
         row [ width Element.fill ]
-            [ el [ alignLeft ] <| playerHighlights otherPlayer
+            [ el [ alignLeft, centerY ] <| playerHighlights otherPlayer
             , el [ centerX ] <| playerHandBacks otherPlayer
             ]
 
@@ -191,9 +191,10 @@ currentPlayerView currentPlayer =
 
 playerHighlights : Player -> Element a
 playerHighlights player =
-    column [ padding 10, spacing 100 ]
+    column [ padding 10, spacing 15 ]
         [ Element.text <| Card.deckName player.deck
-        , Element.html <| viewScore player.score
+        , deckLogo player.deck
+        , el [] <| Element.html <| viewScore player.score
         ]
 
 
@@ -205,6 +206,18 @@ playerHandBacks player =
 playerHand : Player -> Element Msg
 playerHand player =
     cardList 210 player.selected <| Dict.toList player.hand
+
+
+deckLogo : Deck -> Element a
+deckLogo deck =
+    el
+        [ width <| px 100
+        , height <| px 100
+        , Background.image <| Card.deckSymbol deck
+        , Border.width 3
+        , Border.rounded 10
+        ]
+        Element.none
 
 
 gameSlots : Int -> Maybe Card.WithId -> List GameSlot -> Html Msg
