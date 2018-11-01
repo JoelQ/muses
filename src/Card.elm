@@ -7,6 +7,7 @@ module Card exposing
     , cardsForDeck
     , deckChoices
     , deckName
+    , imagePath
     , magnitude
     , magnitudeString
     , name
@@ -26,8 +27,14 @@ type alias WithId =
 
 
 type Card
-    = Character String MuseumPoints (List Trait)
-    | OneShot String Power
+    = Character Config MuseumPoints (List Trait)
+    | OneShot Config Power
+
+
+type alias Config =
+    { name : String
+    , image : String
+    }
 
 
 type Trait
@@ -69,14 +76,29 @@ type Power
     = GeneratePoints MuseumPoints
 
 
-name : Card -> String
-name card =
+config : Card -> Config
+config card =
     case card of
-        Character n _ _ ->
-            n
+        Character conf _ _ ->
+            conf
 
-        OneShot n _ ->
-            n
+        OneShot conf _ ->
+            conf
+
+
+name : Card -> String
+name =
+    .name << config
+
+
+imageFilename : Card -> String
+imageFilename =
+    .image << config
+
+
+imagePath : Card -> String
+imagePath card =
+    "../images/muses-characters/" ++ imageFilename card
 
 
 magnitude : Card -> MuseumPoints
@@ -171,7 +193,7 @@ tragedyDeck : List Card
 tragedyDeck =
     [ sophocles
     , erinyes
-    , agammemnon
+    , agamemnon
     , antigone
     , siren
     , siren
@@ -219,94 +241,130 @@ divinePoetryDeck =
 
 sophocles : Card
 sophocles =
-    Character "Sophocles" (MuseumPoints 1) [ GreatPoet ]
+    Character { name = "Sophocles", image = "sophocles.jpg" }
+        (MuseumPoints 1)
+        [ GreatPoet ]
 
 
 erinyes : Card
 erinyes =
-    Character "Erinyes" (MuseumPoints 2) []
+    Character { name = "Erinyes", image = "erinyes.jpg" }
+        (MuseumPoints 2)
+        []
 
 
-agammemnon : Card
-agammemnon =
-    Character "Agammemnon" (MuseumPoints 3) [ Ruler ]
+agamemnon : Card
+agamemnon =
+    Character { name = "Agammemnon", image = "agamemnon.jpg" }
+        (MuseumPoints 3)
+        [ Ruler ]
 
 
 antigone : Card
 antigone =
-    Character "Antigone" (MuseumPoints 2) [ Female ]
+    Character { name = "Antigone", image = "antigone.jpg" }
+        (MuseumPoints 2)
+        [ Female ]
 
 
 siren : Card
 siren =
-    Character "Siren" (MuseumPoints 1) [ Female ]
+    Character { name = "Siren", image = "sirens.jpg" }
+        (MuseumPoints 1)
+        [ Female ]
 
 
 aristophanes : Card
 aristophanes =
-    Character "Aristophanes" (MuseumPoints 1) [ GreatPoet ]
+    Character { name = "Aristophanes", image = "aristophanes.jpg" }
+        (MuseumPoints 1)
+        [ GreatPoet ]
 
 
 amphitheater : Card
 amphitheater =
-    Character "Amphitheater" (MuseumPoints 1) []
+    Character { name = "Amphitheater", image = "amphitheater.jpg" }
+        (MuseumPoints 1)
+        []
 
 
 satyrPlay : Card
 satyrPlay =
-    OneShot "Satyr Play" (GeneratePoints <| MuseumPoints 10)
+    OneShot { name = "Satyr Play", image = "satyr.jpg" }
+        (GeneratePoints <| MuseumPoints 10)
 
 
 atalanta : Card
 atalanta =
-    Character "Atalanta" (MuseumPoints 2) [ Female, Seafarer ]
+    Character { name = "Atalanta", image = "atalanta.jpg" }
+        (MuseumPoints 2)
+        [ Female, Seafarer ]
 
 
 jason : Card
 jason =
-    Character "Jason" (MuseumPoints 3) [ Seafarer ]
+    Character { name = "Jason", image = "jason.jpg" }
+        (MuseumPoints 3)
+        [ Seafarer ]
 
 
 theseus : Card
 theseus =
-    Character "Theseus" (MuseumPoints 2) [ Seafarer, Underworld ]
+    Character { name = "Theseus", image = "theseus.jpg" }
+        (MuseumPoints 2)
+        [ Seafarer, Underworld ]
 
 
 homer : Card
 homer =
-    Character "Homer" (MuseumPoints 1) [ GreatPoet ]
+    Character { name = "Homer", image = "homer.jpg" }
+        (MuseumPoints 1)
+        [ GreatPoet ]
 
 
 arctinus : Card
 arctinus =
-    Character "Arctinus" (MuseumPoints 1) [ GreatPoet ]
+    Character { name = "Arctinus", image = "arctinus.jpg" }
+        (MuseumPoints 1)
+        [ GreatPoet ]
 
 
 hesiod : Card
 hesiod =
-    Character "Hesiod" (MuseumPoints 1) [ GreatPoet ]
+    Character { name = "Hesiod", image = "hesiod.jpg" }
+        (MuseumPoints 1)
+        [ GreatPoet ]
 
 
 prometheus : Card
 prometheus =
-    Character "Prometheus" (MuseumPoints 2) []
+    Character { name = "Prometheus", image = "prometheus.jpg" }
+        (MuseumPoints 2)
+        []
 
 
 artemis : Card
 artemis =
-    Character "Artemis" (MuseumPoints 3) [ Female ]
+    Character { name = "Artemis", image = "artemis.jpg" }
+        (MuseumPoints 3)
+        [ Female ]
 
 
 poseidon : Card
 poseidon =
-    Character "Poseidon" (MuseumPoints 4) [ Seafarer ]
+    Character { name = "Poseidon", image = "poseidon.jpg" }
+        (MuseumPoints 4)
+        [ Seafarer ]
 
 
 apollo : Card
 apollo =
-    Character "Apollo" (MuseumPoints 5) []
+    Character { name = "Apollo", image = "apollo.jpg" }
+        (MuseumPoints 5)
+        []
 
 
 hymn : Card
 hymn =
-    OneShot "Hymn" (GeneratePoints <| MuseumPoints 10)
+    OneShot { name = "Hymn", image = "hymn.jpg" }
+        (GeneratePoints <| MuseumPoints 10)

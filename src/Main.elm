@@ -216,21 +216,18 @@ imageRatio =
     1.2
 
 
-cardImage : Int -> Element a
-cardImage cardHeight =
+cardImage : Int -> Card -> Element a
+cardImage cardHeight card =
     let
         imageWidth =
             round <| (toFloat cardHeight / cardRatio) / imageRatio
 
         imageHeight =
             round <| toFloat imageWidth / cardRatio
-
-        placeholderString =
-            String.fromInt imageWidth ++ "x" ++ String.fromInt imageHeight
     in
-    Element.image []
-        { src = "https://via.placeholder.com/" ++ placeholderString
-        , description = "placeholder"
+    Element.image [ width <| px imageWidth, height <| px imageHeight ]
+        { src = Card.imagePath card
+        , description = Card.name card
         }
 
 
@@ -264,7 +261,7 @@ cardContents cardHeight card =
         [ el [ alignLeft ] <| Element.text (Card.name card)
         , el [ alignRight ] <| Element.text (Card.magnitudeString card)
         ]
-    , el [ centerX, padding 5 ] (cardImage cardHeight)
+    , el [ centerX, padding 5 ] (cardImage cardHeight card)
     , paragraph [ centerX, Font.italic, Font.size 14 ]
         [ Element.text "Some colorful flavor text that keeps going and going and going" ]
     ]
