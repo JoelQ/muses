@@ -75,7 +75,7 @@ update msg model =
             ( model, Random.generate StartPlaying (Game.shuffleAndStart deck) )
 
         StartPlaying state ->
-            ( Game.Complete state.currentPlayer, Cmd.none )
+            ( Game.Playing state, Cmd.none )
 
         EndTurn ->
             model
