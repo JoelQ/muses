@@ -319,7 +319,7 @@ cardImage cardHeight card =
 cardBack : Int -> Element a
 cardBack cardHeight =
     cardOutline cardHeight
-        [ Background.image "../images/muses-meta/card-back.jpg"
+        [ Background.image "images/muses-meta/card-back.jpg"
         ]
         []
 

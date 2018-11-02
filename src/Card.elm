@@ -107,7 +107,7 @@ flavorText =
 
 imagePath : Card -> String
 imagePath card =
-    "../images/muses-characters/" ++ imageFilename card
+    "images/muses-characters/" ++ imageFilename card
 
 
 magnitude : Card -> MuseumPoints
@@ -186,32 +186,32 @@ deckPortrait : Deck -> String
 deckPortrait deck =
     case deck of
         Tragedy ->
-            "../images/muses-meta/melpomene.jpg"
+            "images/muses-meta/melpomene.jpg"
 
         Comedy ->
-            "../images/muses-meta/thalia.jpg"
+            "images/muses-meta/thalia.jpg"
 
         EpicPoetry ->
-            "../images/muses-meta/calliope.jpg"
+            "images/muses-meta/calliope.jpg"
 
         DivinePoetry ->
-            "../images/muses-meta/polyhymnia.jpg"
+            "images/muses-meta/polyhymnia.jpg"
 
 
 deckSymbol : Deck -> String
 deckSymbol deck =
     case deck of
         Tragedy ->
-            "../images/muses-meta/tragedy.jpg"
+            "images/muses-meta/tragedy.jpg"
 
         Comedy ->
-            "../images/muses-meta/comedy.jpg"
+            "images/muses-meta/comedy.jpg"
 
         EpicPoetry ->
-            "../images/muses-meta/epic-poetry.jpg"
+            "images/muses-meta/epic-poetry.jpg"
 
         DivinePoetry ->
-            "../images/muses-meta/divine-poetry.jpg"
+            "images/muses-meta/divine-poetry.jpg"
 
 
 cardsForDeck : Deck -> List Card
