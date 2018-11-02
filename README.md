@@ -11,6 +11,9 @@ The game was built as an entry for the 2018 [Greek Mytholojam].
 [itch.io]: https://joelq.itch.io/muses-the-card-game
 [Greek Mytholojam]:https://itch.io/jam/greek-mytholojam-2018
 
+![muses-gameplay](https://user-images.githubusercontent.com/1006966/47892300-583baa80-de2d-11e8-86c9-0c1ebb86d70d.jpg)
+
+
 ## Running
 
 Assuming you have Elm 0.18 installed:
