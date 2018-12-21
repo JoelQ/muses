@@ -25,11 +25,11 @@ import Element.Background as Background
 import Element.Border as Border
 import Element.Events as Events
 import Element.Font as Font
+import Element.Input as Input
 import Game exposing (Game, GameState)
 import GameSlot exposing (GameSlot(..))
-import Html exposing (..)
-import Html.Attributes exposing (max, value)
-import Html.Events exposing (onClick)
+import Html exposing (Html)
+import Html.Attributes
 import MuseumPoints exposing (MuseumPoints(..))
 import Player exposing (Player)
 import Random
@@ -106,7 +106,7 @@ update msg model =
 view : Model -> Browser.Document Msg
 view model =
     { title = "Muses"
-    , body = [ h1 [] [ text "Muses" ], viewGame model ]
+    , body = [ Html.h1 [] [ Html.text "Muses" ], viewGame model ]
     }
 
 
@@ -117,7 +117,7 @@ viewGame game =
             choiceScreen
 
         Game.Playing state ->
-            viewPlaying state
+            Element.layout [] <| viewPlaying state
 
         Game.Complete winner ->
             winScreen winner
@@ -167,43 +167,61 @@ portrait attributes cardHeight deck =
         ]
 
 
-viewPlaying : GameState -> Html Msg
+viewPlaying : GameState -> Element Msg
 viewPlaying { currentPlayer, otherPlayer, slots } =
-    div []
+    column [ width Element.fill ]
         [ otherPlayerView otherPlayer
-        , hr [] []
         , centerSection currentPlayer slots
-        , hr [] []
         , currentPlayerView currentPlayer
         ]
 
 
-centerSection : Player -> List GameSlot -> Html Msg
+blanchedAlmond : Element.Color
+blanchedAlmond =
+    Element.rgb255 255 235 205
+
+
+burlywood : Element.Color
+burlywood =
+    Element.rgb255 222 184 135
+
+
+centerSection : Player -> List GameSlot -> Element Msg
 centerSection player slots =
-    Element.layout [] <|
-        row [ width Element.fill ]
-            [ el [ alignLeft, centerY, padding 10 ] <|
-                Element.html (button [ onClick EndTurn ] [ text "End Turn" ])
-            , el [ centerX ] <| gameSlots 200 (Player.selectedCard player) slots
-            ]
+    row
+        [ width Element.fill
+        , Background.color blanchedAlmond
+        , padding 15
+        ]
+        [ el [ alignLeft, centerY, padding 10 ] <|
+            Input.button []
+                { onPress = Just EndTurn, label = Element.text "End Turn" }
+        , el [ centerX ] <| gameSlots 200 (Player.selectedCard player) slots
+        ]
 
 
-otherPlayerView : Player -> Html Msg
+otherPlayerView : Player -> Element Msg
 otherPlayerView otherPlayer =
-    Element.layout [] <|
-        row [ width Element.fill ]
-            [ el [ alignLeft, centerY ] <| playerHighlights otherPlayer
-            , el [ centerX ] <| playerHandBacks otherPlayer
-            ]
+    row
+        [ width Element.fill
+        , padding 15
+        , Background.color burlywood
+        ]
+        [ el [ alignLeft, centerY ] <| playerHighlights otherPlayer
+        , el [ centerX ] <| playerHandBacks otherPlayer
+        ]
 
 
-currentPlayerView : Player -> Html Msg
+currentPlayerView : Player -> Element Msg
 currentPlayerView currentPlayer =
-    Element.layout [] <|
-        row [ width Element.fill ]
-            [ el [ alignLeft ] <| playerHighlights currentPlayer
-            , el [ centerX ] <| playerHand currentPlayer
-            ]
+    row
+        [ width Element.fill
+        , Background.color burlywood
+        , padding 15
+        ]
+        [ el [ alignLeft ] <| playerHighlights currentPlayer
+        , el [ centerX ] <| playerHand currentPlayer
+        ]
 
 
 playerHighlights : Player -> Element a
@@ -211,7 +229,7 @@ playerHighlights player =
     column [ padding 10, spacing 15 ]
         [ Element.text <| Card.deckName player.deck
         , deckLogo player.deck
-        , el [] <| Element.html <| viewScore player.score
+        , el [] <| viewScore player.score
         ]
 
 
@@ -281,14 +299,21 @@ emptySlot cardHeight slot =
         ]
 
 
-viewScore : Int -> Html a
+viewScore : Int -> Element a
 viewScore score =
-    div []
-        [ text (String.fromInt score)
-        , text " "
-        , Html.progress [ max "100", value (String.fromInt score) ]
-            [ text (String.fromInt score) ]
+    row [ spacing 5 ]
+        [ el [] <| Element.text (String.fromInt score)
+        , el [] <| Element.html <| scoreProgressBar score
         ]
+
+
+scoreProgressBar : Int -> Html a
+scoreProgressBar score =
+    Html.progress
+        [ Html.Attributes.max "100"
+        , Html.Attributes.value (String.fromInt score)
+        ]
+        [ Html.text (String.fromInt score) ]
 
 
 cardRatio : Float
